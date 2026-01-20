@@ -15,7 +15,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import * as Location from 'expo-location';
 import * as DocumentPicker from 'expo-document-picker';
 
-const API_URL = 'http://localhost:5000';
+const API_URL = 'http://192.168.1.22:5000';
 
 const ReportFormScreen = () => {
   const insets = useSafeAreaInsets();
@@ -106,11 +106,13 @@ const handleDetectLocation = async () => {
   }
 };
 
-
-  // 📁 SUBIR ARCHIVO REAL
-  const handleUploadFile = async () => {
+// 📁 SUBIR ARCHIVO REAL (SEGÚN CONTRATO BACKEND)
+const handleUploadFile = async () => {
+  try {
     const result = await DocumentPicker.getDocumentAsync({
       type: ['image/*', 'video/*'],
+      copyToCacheDirectory: true,
+      multiple: false,
     });
 
     if (result.canceled) return;
@@ -118,29 +120,52 @@ const handleDetectLocation = async () => {
     const file = result.assets[0];
 
     const formData = new FormData();
+
     formData.append('file', {
       uri: file.uri,
-      name: file.name,
-      type: file.mimeType,
+      name: file.name || `media-${Date.now()}`,
+      type: file.mimeType || 'application/octet-stream',
     } as any);
 
-    const res = await fetch(`${API_URL}/api/media/upload`, {
+    const response = await fetch(`${API_URL}/api/media/upload`, {
       method: 'POST',
       body: formData,
+      // ❌ NO AGREGAR HEADERS Content-Type
     });
 
-    const data = await res.json();
+    if (!response.ok) {
+      throw new Error('Error al subir archivo');
+    }
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error('El servidor no aceptó el archivo');
+    }
 
     setMedia((prev) => [
       ...prev,
-      { type: data.type, url: data.url },
+      {
+        type: data.type, // image | video
+        url: data.url,
+      },
     ]);
 
     Alert.alert('Archivo subido', 'Archivo agregado correctamente');
-  };
+  } catch (error: any) {
+    console.error(error);
+    Alert.alert(
+      'Error',
+      error.message || 'No se pudo subir el archivo'
+    );
+  }
+};
 
   // 🚀 ENVIAR REPORTE
   const handleSubmit = async () => {
+  try {
+    console.log('🚀 Enviando denuncia...');
+
     if (!category || description.length < 10 || !coordinates) {
       Alert.alert('Error', 'Completa todos los campos obligatorios');
       return;
@@ -158,20 +183,23 @@ const handleDetectLocation = async () => {
       media,
     };
 
-    await fetch(`${API_URL}/api/reports`, {
+    const response = await fetch(`${API_URL}/api/reports`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
 
+    if (!response.ok) {
+      throw new Error('Error al enviar la denuncia');
+    }
+
     Alert.alert('Denuncia enviada', 'Gracias por reportar');
 
-    setCategory('');
-    setDescription('');
-    setLocationText('');
-    setCoordinates(null);
-    setMedia([]);
-  };
+  } catch (error) {
+    console.error(error);
+    Alert.alert('Error', 'No se pudo enviar la denuncia');
+  }
+};
 
   return (
     <SafeAreaView className="flex-1 bg-white">
