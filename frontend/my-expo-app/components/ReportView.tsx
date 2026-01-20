@@ -12,13 +12,19 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Location from 'expo-location';
+import * as DocumentPicker from 'expo-document-picker';
+
+const API_URL = 'http://localhost:5000';
 
 const ReportFormScreen = () => {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState('reportar');
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
-  const [location, setLocation] = useState('');
+  const [locationText, setLocationText] = useState('');
+  const [coordinates, setCoordinates] = useState<number[] | null>(null);
+  const [media, setMedia] = useState<any[]>([]);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
 
   const categories = [
@@ -31,52 +37,140 @@ const ReportFormScreen = () => {
     'Otras irregularidades',
   ];
 
-  const handleDetectLocation = () => {
-    // Simulación de detección de ubicación
-    Alert.alert(
-      'Ubicación Detectada',
-      'Se ha detectado tu zona aproximada: Centro, Quito',
-      [{ text: 'OK' }]
-    );
-    setLocation('Centro, Quito (zona aproximada)');
+  const mapCategory = (cat: string) => {
+    const map: any = {
+      'Precios abusivos': 'precios_abusivos',
+      'Mal servicio al cliente': 'mala_atencion',
+      'Mala calidad de productos': 'productos_defectuosos',
+      'Publicidad engañosa': 'publicidad_enganosa',
+      'Falta de información': 'otros',
+      'Incumplimiento de garantías': 'otros',
+      'Otras irregularidades': 'otros',
+    };
+    return map[cat] || 'otros';
   };
 
-  const handleUploadFile = () => {
-    Alert.alert(
-      'Subir Archivo',
-      'Selecciona fotos o videos de evidencia',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Galería' },
-        { text: 'Cámara' },
-      ]
-    );
+ // 📍 UBICACIÓN REAL (sector / barrio)
+const handleDetectLocation = async () => {
+  try {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permiso denegado', 'No se pudo acceder a la ubicación');
+      return;
+    }
+
+    const loc = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.High,
+    });
+
+    const geo = await Location.reverseGeocodeAsync({
+      latitude: loc.coords.latitude,
+      longitude: loc.coords.longitude,
+    });
+
+    if (!geo || geo.length === 0) {
+      Alert.alert('Error', 'No se pudo obtener la dirección');
+      return;
+    }
+
+    const address = geo[0];
+
+    // 🏘️ Construcción de dirección real
+    const sector =
+    address.district ||
+    address.subregion ||
+    address.city ||
+    'Sector no identificado';
+
+    const city = address.city || '';
+    const province = address.region || '';
+
+    const finalAddress = [
+      sector && `Sector: ${sector}`,
+      city,
+      province,
+    ]
+      .filter(Boolean)
+      .join(', ');
+
+    // 📌 Guardamos coordenadas reales
+    setCoordinates([loc.coords.longitude, loc.coords.latitude]);
+
+    // 📍 Se copia automáticamente en el TextInput
+    setLocationText(finalAddress);
+
+    Alert.alert('Ubicación detectada', finalAddress);
+  } catch (error) {
+    console.error(error);
+    Alert.alert('Error', 'No se pudo obtener la ubicación');
+  }
+};
+
+
+  // 📁 SUBIR ARCHIVO REAL
+  const handleUploadFile = async () => {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: ['image/*', 'video/*'],
+    });
+
+    if (result.canceled) return;
+
+    const file = result.assets[0];
+
+    const formData = new FormData();
+    formData.append('file', {
+      uri: file.uri,
+      name: file.name,
+      type: file.mimeType,
+    } as any);
+
+    const res = await fetch(`${API_URL}/api/media/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await res.json();
+
+    setMedia((prev) => [
+      ...prev,
+      { type: data.type, url: data.url },
+    ]);
+
+    Alert.alert('Archivo subido', 'Archivo agregado correctamente');
   };
 
-  const handleSubmit = () => {
-    if (!category) {
-      Alert.alert('Error', 'Debes seleccionar una categoría');
-      return;
-    }
-    if (description.length < 10) {
-      Alert.alert('Error', 'La descripción debe tener al menos 10 caracteres');
-      return;
-    }
-    if (!location) {
-      Alert.alert('Error', 'Debes proporcionar una ubicación');
+  // 🚀 ENVIAR REPORTE
+  const handleSubmit = async () => {
+    if (!category || description.length < 10 || !coordinates) {
+      Alert.alert('Error', 'Completa todos los campos obligatorios');
       return;
     }
 
-    Alert.alert(
-      'Denuncia Enviada',
-      'Tu denuncia ha sido enviada de forma anónima. Gracias por contribuir a mejorar los servicios.',
-      [{ text: 'OK' }]
-    );
+    const payload = {
+      anonymousUserId: 'anon_' + Math.random().toString(36).substring(2, 10),
+      category: mapCategory(category),
+      description,
+      location: {
+        type: 'Point',
+        coordinates,
+      },
+      addressReference: locationText,
+      media,
+    };
 
-    // Limpiar formulario
+    await fetch(`${API_URL}/api/reports`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    Alert.alert('Denuncia enviada', 'Gracias por reportar');
+
     setCategory('');
     setDescription('');
-    setLocation('');
+    setLocationText('');
+    setCoordinates(null);
+    setMedia([]);
   };
 
   return (
@@ -174,12 +268,13 @@ const ReportFormScreen = () => {
             <View className="flex-row items-center bg-white rounded-lg px-4 py-3 border border-slate-300 mb-3">
               <Text className="text-slate-400 mr-2">📍</Text>
               <TextInput
-                value={location}
-                onChangeText={setLocation}
+                value={locationText}
+                onChangeText={setLocationText}
                 placeholder="Ubicación aproximada (requerida)"
                 placeholderTextColor="#94a3b8"
                 className="flex-1 text-sm text-slate-800"
-              />
+                />
+
             </View>
 
             <TouchableOpacity
