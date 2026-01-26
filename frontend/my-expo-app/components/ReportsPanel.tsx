@@ -20,16 +20,11 @@ const API_URL = 'http://192.168.1.22:5000';
 /* API → UI */
 const mapStatusFromApi = (status: string) => {
   switch (status) {
-    case 'pending':
-      return 'PENDING';
-    case 'in_review':
-      return 'IN_REVIEW';
-    case 'resolved':
-      return 'RESOLVED';
-    case 'rejected':
-      return 'REJECTED';
-    default:
-      return 'PENDING';
+    case 'pending': return 'PENDING';
+    case 'in_review': return 'IN_REVIEW';
+    case 'resolved': return 'RESOLVED';
+    case 'rejected': return 'REJECTED';
+    default: return 'PENDING';
   }
 };
 
@@ -45,7 +40,6 @@ const ReportsPanel = () => {
      ========================= */
   const loadReports = async () => {
     try {
-      setLoading(true);
       const res = await fetch(`${API_URL}/api/reports`);
       const data = await res.json();
 
@@ -64,8 +58,16 @@ const ReportsPanel = () => {
     }
   };
 
+  /* =========================
+     AUTO REFRESH cada 5 segundos
+     ========================= */
   useEffect(() => {
-    loadReports();
+    loadReports(); // carga inicial
+    const interval = setInterval(() => {
+      loadReports();
+    }, 5000); // cada 5 segundos
+
+    return () => clearInterval(interval); // limpiar al desmontar
   }, []);
 
   /* =========================
@@ -100,9 +102,7 @@ const ReportsPanel = () => {
       style={{ flex: 1, backgroundColor: '#E8EDFF' }}
       contentContainerStyle={{ paddingBottom: 32 }}
     >
-      {/* =========================
-          FILTERS MODAL
-          ========================= */}
+      {/* FILTERS MODAL */}
       <Modal visible={showFilters} animationType="slide">
         <FiltersPanel
           onClose={() => setShowFilters(false)}
@@ -110,42 +110,28 @@ const ReportsPanel = () => {
         />
       </Modal>
 
-      {/* =========================
-          DETAIL MODAL
-          ========================= */}
+      {/* DETAIL MODAL */}
       <Modal visible={!!selectedReport} animationType="slide">
         {selectedReport && (
           <ReportDetail
             report={selectedReport}
             onClose={() => setSelectedReport(null)}
-            onUpdated={loadReports}
+            onUpdated={loadReports} // actualiza al cerrar detalle
           />
         )}
       </Modal>
 
-      {/* =========================
-          HEADER
-          ========================= */}
+      {/* HEADER */}
       <View style={{ backgroundColor: '#1e40af', padding: 20 }}>
-        <Text className="text-2xl text-white font-bold">
-          Panel de Reportes
-        </Text>
-        <Text className="text-white">
-          Gestión y supervisión de denuncias
-        </Text>
+        <Text className="text-2xl text-white font-bold">Panel de Reportes</Text>
+        <Text className="text-white">Gestión y supervisión de denuncias</Text>
       </View>
 
       <View className="px-4 py-4">
-        {/* =========================
-            SEARCH + FILTER
-            ========================= */}
+        {/* SEARCH + FILTER */}
         <View className="flex-row items-center gap-3">
           <View className="flex-row items-center bg-white rounded-full px-4 py-3 flex-1">
-            <MaterialCommunityIcons
-              name="magnify"
-              size={20}
-              color="#6b7280"
-            />
+            <MaterialCommunityIcons name="magnify" size={20} color="#6b7280" />
             <TextInput
               placeholder="Buscar por ID o descripción"
               value={query}
@@ -159,19 +145,13 @@ const ReportsPanel = () => {
             onPress={() => setShowFilters(true)}
           >
             <View className="flex-row items-center">
-              <MaterialCommunityIcons
-                name="filter-variant"
-                size={18}
-                color="white"
-              />
+              <MaterialCommunityIcons name="filter-variant" size={18} color="white" />
               <Text className="text-white ml-2">Filtros</Text>
             </View>
           </TouchableOpacity>
         </View>
 
-        {/* =========================
-            STATS
-            ========================= */}
+        {/* STATS */}
         <View
           style={{
             flexDirection: 'row',
@@ -188,25 +168,17 @@ const ReportsPanel = () => {
           ].map((c) => (
             <View key={c.label} style={{ width: '48%', marginBottom: 12 }}>
               <View className="bg-white rounded-xl p-4">
-                <Text className={`${c.color} font-bold text-xl`}>
-                  {c.value}
-                </Text>
+                <Text className={`${c.color} font-bold text-xl`}>{c.value}</Text>
                 <Text className="text-gray-500">{c.label}</Text>
               </View>
             </View>
           ))}
         </View>
 
-        {/* =========================
-            REPORTS LIST
-            ========================= */}
+        {/* REPORTS LIST */}
         <View className="mt-6">
           {filtered.map((r) => (
-            <ReportItem
-              key={r.id}
-              report={r}
-              onPress={() => setSelectedReport(r)}
-            />
+            <ReportItem key={r.id} report={r} onPress={() => setSelectedReport(r)} />
           ))}
         </View>
       </View>
