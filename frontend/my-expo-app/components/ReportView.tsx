@@ -17,7 +17,7 @@ import * as DocumentPicker from 'expo-document-picker';
 
 const API_URL = 'http://192.168.1.22:5000';
 
-const ReportFormScreen = () => {
+const ReportView = () => {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState('reportar');
   const [category, setCategory] = useState('');
@@ -361,120 +361,9 @@ const handleUploadFile = async () => {
             </Text>
           </TouchableOpacity>
         </ScrollView>
-
-        {/* Bottom Navigation Bar */}
-        <View className="bg-white border-t border-slate-200 py-3">
-          <View className="flex-row items-center">
-            <TouchableOpacity
-              onPress={() => setActiveTab('inicio')}
-              className="flex-1 items-center ml-2"
-            >
-              <Image
-                source={{
-                  uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/twxd10f7_expires_30_days.png',
-                }}
-                resizeMode="stretch"
-                className="w-6 h-6 mb-1"
-              />
-              <Text
-                className={`text-xs ${
-                  activeTab === 'inicio'
-                    ? 'text-indigo-900 font-bold'
-                    : 'text-slate-500'
-                }`}
-              >
-                Inicio
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setActiveTab('reportar')}
-              className={`flex-1 items-center rounded-2xl py-2 ${
-                activeTab === 'reportar' ? 'bg-indigo-200' : ''
-              }`}
-            >
-              <Image
-                source={{
-                  uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/211j0lmf_expires_30_days.png',
-                }}
-                resizeMode="stretch"
-                className="w-6 h-6 mb-1"
-              />
-              <Text className="text-indigo-900 text-xs font-bold">
-                Reportar
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setActiveTab('reportes')}
-              className="flex-1 items-center"
-            >
-              <Image
-                source={{
-                  uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/jvjhvsz2_expires_30_days.png',
-                }}
-                resizeMode="stretch"
-                className="w-6 h-6 mb-1"
-              />
-              <Text
-                className={`text-xs ${
-                  activeTab === 'reportes'
-                    ? 'text-indigo-900 font-bold'
-                    : 'text-slate-500'
-                }`}
-              >
-                Reportes
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setActiveTab('chat')}
-              className="flex-1 items-center mr-4"
-            >
-              <Image
-                source={{
-                  uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/6vl3tqoi_expires_30_days.png',
-                }}
-                resizeMode="stretch"
-                className="w-6 h-6 mb-1"
-              />
-              <Text
-                className={`text-xs ${
-                  activeTab === 'chat'
-                    ? 'text-indigo-900 font-bold'
-                    : 'text-slate-500'
-                }`}
-              >
-                Asistente
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setActiveTab('perfil')}
-              className="mr-5 items-center"
-            >
-              <Image
-                source={{
-                  uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/7992ct08_expires_30_days.png',
-                }}
-                resizeMode="stretch"
-                className="w-6 h-6 mb-1"
-              />
-              <Text
-                className={`text-xs ${
-                  activeTab === 'perfil'
-                    ? 'text-indigo-900 font-bold'
-                    : 'text-slate-500'
-                }`}
-              >
-                Perfil
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
 
-export default ReportFormScreen;
+export default ReportView;
