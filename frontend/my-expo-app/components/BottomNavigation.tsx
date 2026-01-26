@@ -4,7 +4,7 @@ import { Image } from 'react-native';
 
 import ReportView from '../components/ReportView';
 import Inicio from '../components/Inicio';
-import ReportItem from '../components/ReportItem';
+import ReportsPanel from '../components/ReportsPanel';
 import ChatScreen from '../components/ChatScreen';
 import ProfileScreen from '../components/ProfileScreen';
 
@@ -46,6 +46,19 @@ const BottomTabs = () => {
           tabBarIcon: () => (
             <Image
               source={{ uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/211j0lmf_expires_30_days.png' }}
+              style={{ width: 22, height: 22 }}
+            />
+          ),
+        }}
+      />
+
+      <Tab.Screen
+        name="Reportes"
+        component={ReportsPanel}
+        options={{
+          tabBarIcon: () => (
+            <Image
+              source={{ uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/jvjhvsz2_expires_30_days.png' }}
               style={{ width: 22, height: 22 }}
             />
           ),

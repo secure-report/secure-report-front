@@ -17,8 +17,9 @@ export interface LocationPoint {
 export interface MediaItem {
   id: string;
   type: 'image' | 'video';
-  uri: string;
+  url: string; // cambiar uri -> url
 }
+
 
 export interface Report {
   id: string; // alias for _id
