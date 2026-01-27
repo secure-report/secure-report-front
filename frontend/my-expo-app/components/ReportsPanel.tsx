@@ -14,8 +14,7 @@ import ReportItem from './ReportItem';
 import ReportDetail from './ReportDetail';
 import FiltersPanel from './FiltersPanel';
 import { Report } from './reportModel';
-
-const API_URL = 'http://192.168.1.22:5000';
+import { API_REPORTS_URL } from '../config/api';
 
 /* API → UI */
 const mapStatusFromApi = (status: string) => {
@@ -40,7 +39,7 @@ const ReportsPanel = () => {
      ========================= */
   const loadReports = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/reports`);
+      const res = await fetch(`${API_REPORTS_URL}/api/reports`);
       const data = await res.json();
 
       setReports(

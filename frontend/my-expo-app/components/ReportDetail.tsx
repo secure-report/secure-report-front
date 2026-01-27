@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator, Ima
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Report } from './reportModel';
 
-const API_URL = 'http://192.168.1.22:5000';
+import { API_REPORTS_URL } from '../config/api';
 
 /* Mapeo del estado de UI al API */
 const mapStatusToApi = (status: string) => {
@@ -66,7 +66,7 @@ const ReportDetail = ({
   const applyChanges = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/api/reports/${report.id}/status`, {
+      const res = await fetch(`${API_REPORTS_URL}/api/reports/${report.id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: mapStatusToApi(status) }),
