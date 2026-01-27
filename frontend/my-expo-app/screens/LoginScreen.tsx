@@ -14,7 +14,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/RootNavigator';
-import { API_BASE_URL } from '../config/api';
+import { API_REPORTS_URL } from '../config/api';
+import { useAuth } from '../context/AuthContext';
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -23,6 +24,8 @@ export default () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation<LoginScreenNavigationProp>();
+
+  const { signIn } = useAuth();
 
   const handleLogin = async () => {
     // Validación básica
@@ -36,7 +39,7 @@ export default () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetch(`${API_REPORTS_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,10 +53,10 @@ export default () => {
       const data = await response.json();
 
       if (response.ok && data.token) {
-        // Guardar token en AsyncStorage
-        await AsyncStorage.setItem('token', data.token);
-        // Navegar a Welcome
-        navigation.navigate('Welcome');
+        // Guardar token y actualizar estado global
+        await signIn(data.token);
+        // Ahora resetear la navegación al Home
+        
       } else {
         Alert.alert('Error', data.error || 'Credenciales inválidas');
       }

@@ -14,8 +14,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 import * as DocumentPicker from 'expo-document-picker';
-
-const API_URL = 'http://192.168.1.22:5000';
+import { API_REPORTS_URL } from '../config/api';
 
 const ReportView = () => {
   const insets = useSafeAreaInsets();
@@ -127,7 +126,7 @@ const handleUploadFile = async () => {
       type: file.mimeType || 'application/octet-stream',
     } as any);
 
-    const response = await fetch(`${API_URL}/api/media/upload`, {
+    const response = await fetch(`${API_REPORTS_URL}/api/media/upload`, {
       method: 'POST',
       body: formData,
       // ❌ NO AGREGAR HEADERS Content-Type
@@ -183,7 +182,7 @@ const handleUploadFile = async () => {
       media,
     };
 
-    const response = await fetch(`${API_URL}/api/reports`, {
+    const response = await fetch(`${API_REPORTS_URL}/api/reports`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

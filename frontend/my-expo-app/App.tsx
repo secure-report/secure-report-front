@@ -1,18 +1,28 @@
 import { NavigationContainer } from '@react-navigation/native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import BottomTabs from './components/BottomNavigation';
+import { AuthProvider } from './context/AuthContext';
+import { RootNavigator } from './navigation/RootNavigator';
 
 import './global.css';
 
+function AppContent() {
+  const insets = useSafeAreaInsets();
+  return (
+    <NavigationContainer>
+      <RootNavigator bottomInset={insets.bottom} />
+      <StatusBar style="light" />
+    </NavigationContainer>
+  );
+}
+
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <BottomTabs />
-        <StatusBar style="light" />
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <AuthProvider>
+      <SafeAreaProvider>
+        <AppContent />
+      </SafeAreaProvider>
+    </AuthProvider>
   );
 }
 
