@@ -99,7 +99,7 @@ export default () => {
                     paddingVertical: 18 * scale,
                     marginBottom: 12,
                   }}
-                  onPress={() => alert("Ingresa como protector")}
+                  onPress={() => navigation.navigate('Login')}
                 >
                   <Text style={{ color: "#FFFFFF", fontSize: 15 }}>
                     Ingresa como protector
