@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   SafeAreaView,
   View,
@@ -10,11 +10,13 @@ import {
   useWindowDimensions,
   StatusBar,
   Platform,
+  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from 'navigation/RootNavigator';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -99,7 +101,7 @@ export default () => {
                     paddingVertical: 18 * scale,
                     marginBottom: 12,
                   }}
-                  onPress={() => alert("Ingresa como protector")}
+                  onPress={() => navigation.navigate('Login')}
                 >
                   <Text style={{ color: "#FFFFFF", fontSize: 15 }}>
                     Ingresa como protector
