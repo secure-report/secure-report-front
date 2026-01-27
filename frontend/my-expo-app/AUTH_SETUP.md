@@ -2,7 +2,7 @@
 
 ## Backend URL
 ```
-http://192.168.100.6:5000```
+http://192.168.100.6:8000```
 
 ## Usuario de Prueba Actual
 ```
@@ -126,12 +126,12 @@ npm install @react-native-async-storage/async-storage
 
 Actualizar en `screens/LoginScreen.tsx` y `screens/SignUpScreen.tsx`:
 ```typescript
-const BASE_URL = "http://192.168.100.6:5000";
+const BASE_URL = "http://192.168.100.6:8000";
 ```
 
 Cambiar a:
 ```typescript
-const BASE_URL = process.env.REACT_APP_API_URL || "http://192.168.100.6:5000";
+const BASE_URL = process.env.REACT_APP_API_URL || "http://192.168.100.6:8000";
 ```
 
 ## Cómo Usar el Token en Requests
@@ -152,7 +152,7 @@ const response = await fetch('/api/reports', {
 
 ## Testing en Swagger
 
-Accede a: http://192.168.100.6:5000/docs
+Accede a: http://192.168.100.6:8000/docs
 - Haz clic en "Try it out" en cada endpoint
 - Prueba con las credenciales del usuario de prueba
 

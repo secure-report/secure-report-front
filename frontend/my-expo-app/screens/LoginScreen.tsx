@@ -1,548 +1,397 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
-  SafeAreaView,
   View,
   ScrollView,
   Image,
   Text,
   TextInput,
   TouchableOpacity,
-  useWindowDimensions,
-  StatusBar,
+  StyleSheet,
   Alert,
-  ActivityIndicator,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import type { RootStackParamList } from "navigation/RootNavigator";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+} from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/RootNavigator';
+import { API_BASE_URL } from '../config/api';
 
-type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "Login">;
-
-const BASE_URL = "http://192.168.100.6:5000";
+type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
 export default () => {
-  const { width } = useWindowDimensions();
-  const navigation = useNavigation<LoginScreenNavigationProp>();
-  const scale = width / 375;
-
-  const [email, setEmail] = useState("carlos@email.com");
-  const [password, setPassword] = useState("123456");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation<LoginScreenNavigationProp>();
 
   const handleLogin = async () => {
-    if (!email.trim()) {
-      Alert.alert("Error", "Por favor ingresa tu correo electrónico");
+    // Validación básica
+    if (!email || !password) {
+      Alert.alert('Error', 'Por favor ingresa email y contraseña');
       return;
     }
-    if (!password.trim()) {
-      Alert.alert("Error", "Por favor ingresa tu contraseña");
+    if (!email.includes('@')) {
+      Alert.alert('Error', 'Por favor ingresa un email válido');
       return;
     }
 
-    setLoading(true);
     try {
-      const response = await fetch(`${BASE_URL}/api/auth/login`, {
-        method: "POST",
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: email.trim(),
-          password: password,
+          email,
+          password,
         }),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        // Guardar token
-        await AsyncStorage.setItem("adminToken", data.token);
-        // Guardar datos del usuario
-        await AsyncStorage.setItem("adminUser", JSON.stringify(data.user));
-        // Navegar a Home
-        navigation.navigate("Home");
+      if (response.ok && data.token) {
+        // Guardar token en AsyncStorage
+        await AsyncStorage.setItem('token', data.token);
+        // Navegar a Welcome
+        navigation.navigate('Welcome');
       } else {
-        Alert.alert("Error", data.error || "Credenciales inválidas");
+        Alert.alert('Error', data.error || 'Credenciales inválidas');
       }
     } catch (error) {
-      Alert.alert("Error", "No se pudo conectar con el servidor");
-      console.error(error);
-    } finally {
-      setLoading(false);
+      Alert.alert('Error', 'No se pudo conectar al servidor');
     }
   };
 
-  const handleSignUp = () => {
-    navigation.navigate("SignUp");
-  };
-
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: "#FFFFFF",
-      }}
-    >
-      <StatusBar barStyle="dark-content" backgroundColor="#1E3A8A" />
-      <ScrollView
-        style={{
-          flex: 1,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        <View
-          style={{
-            backgroundColor: "#E8EDFF",
-            paddingBottom: 32,
-          }}
-        >
-          <View
-            style={{
-              alignItems: "center",
-              backgroundColor: "#1E3A8A",
-              paddingTop: 64,
-              paddingBottom: 32,
-            }}
-          >
+    <SafeAreaProvider style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.column}>
+          <View style={styles.column2}>
             <Image
               source={{
-                uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/gs8FHbyPsH/mrcwonl9_expires_30_days.png",
+                uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/gs8FHbyPsH/mrcwonl9_expires_30_days.png',
               }}
-              resizeMode="stretch"
-              style={{
-                width: 96,
-                height: 96,
-                marginBottom: 24,
-              }}
+              resizeMode={'stretch'}
+              style={styles.image}
             />
-            <View
-              style={{
-                paddingBottom: 1,
-                marginBottom: 8,
-              }}
-            >
-              <Text
-                style={{
-                  color: "#FFFFFF",
-                  fontSize: 30,
-                  fontWeight: "bold",
-                }}
-              >
-                {"SecureReport"}
-              </Text>
+            <View style={styles.view}>
+              <Text style={styles.text}>SecureReport</Text>
             </View>
-            <View
-              style={{
-                alignSelf: "stretch",
-                paddingBottom: 1,
-                marginBottom: 0,
-                marginHorizontal: 48,
-              }}
-            >
-              <Text
-                style={{
-                  color: "#FFFEFE",
-                  fontSize: 14,
-                  textAlign: "center",
-                }}
-              >
-                {"Sistema de Denuncias Anónimas"}
-              </Text>
+            <View style={styles.view2}>
+              <Text style={styles.text2}>Sistema de Denuncias Anónimas</Text>
             </View>
           </View>
-
-          <View
-            style={{
-              marginBottom: 32,
-              marginHorizontal: 24,
-              marginTop: 32,
-            }}
-          >
-            <View
-              style={{
-                alignSelf: "flex-start",
-                paddingBottom: 1,
-                marginBottom: 8,
-              }}
-            >
-              <Text
-                style={{
-                  color: "#0A1433",
-                  fontSize: 24,
-                  fontWeight: "bold",
-                }}
-              >
-                {"Iniciar Sesión"}
+          <View style={styles.column3}>
+            <View style={styles.view3}>
+              <Text style={styles.text3}>Iniciar Sesión</Text>
+            </View>
+            <View style={styles.view4}>
+              <Text style={styles.text4}>
+                Accede de forma segura para realizar tus denuncias
               </Text>
             </View>
-            <View
-              style={{
-                alignSelf: "flex-start",
-                paddingBottom: 1,
-                marginBottom: 24,
-              }}
-            >
-              <Text
-                style={{
-                  color: "#475569",
-                  fontSize: 16,
-                  lineHeight: 24,
-                }}
-              >
-                {"Accede de forma segura para realizar tus denuncias"}
-              </Text>
-            </View>
-
-            <View
-              style={{
-                marginBottom: 24,
-              }}
-            >
-              {/* Email Input */}
-              <View
-                style={{
-                  marginBottom: 20,
-                }}
-              >
-                <View
-                  style={{
-                    paddingBottom: 1,
-                    marginBottom: 8,
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: "#0A1433",
-                      fontSize: 16,
-                      fontWeight: "500",
-                    }}
-                  >
-                    {"Correo Electrónico"}
-                  </Text>
+            <View style={styles.column4}>
+              <View style={styles.column5}>
+                <View style={styles.view}>
+                  <Text style={styles.text5}>Correo Electrónico</Text>
                 </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    backgroundColor: "#FFFFFF",
-                    borderColor: "#CBD5E1",
-                    borderRadius: 16,
-                    borderWidth: 2,
-                    paddingHorizontal: 16,
-                  }}
-                >
+                <View style={styles.row}>
                   <Image
                     source={{
-                      uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/gs8FHbyPsH/r7nowmd5_expires_30_days.png",
+                      uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/gs8FHbyPsH/r7nowmd5_expires_30_days.png',
                     }}
-                    resizeMode="stretch"
-                    style={{
-                      width: 20,
-                      height: 20,
-                      marginRight: 12,
-                    }}
+                    resizeMode={'stretch'}
+                    style={styles.image2}
                   />
                   <TextInput
-                    placeholder={"tu@email.com"}
+                    placeholder={'tu@email.com'}
                     value={email}
                     onChangeText={setEmail}
-                    placeholderTextColor="#CBD5E1"
+                    style={styles.input}
                     keyboardType="email-address"
                     autoCapitalize="none"
-                    editable={!loading}
-                    style={{
-                      color: "#0A1332",
-                      fontSize: 16,
-                      flex: 1,
-                      paddingVertical: 17,
-                    }}
                   />
                 </View>
               </View>
-
-              {/* Password Input */}
-              <View
-                style={{
-                  marginBottom: 23,
-                }}
-              >
-                <View
-                  style={{
-                    paddingBottom: 1,
-                    marginBottom: 8,
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: "#0A1433",
-                      fontSize: 16,
-                      fontWeight: "500",
-                    }}
-                  >
-                    {"Contraseña"}
-                  </Text>
+              <View style={styles.column6}>
+                <View style={styles.view}>
+                  <Text style={styles.text5}>Contraseña</Text>
                 </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    backgroundColor: "#FFFFFF",
-                    borderColor: "#CBD5E1",
-                    borderRadius: 16,
-                    borderWidth: 2,
-                    paddingHorizontal: 16,
-                  }}
-                >
+                <View style={styles.row2}>
                   <Image
                     source={{
-                      uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/gs8FHbyPsH/mosq4e9l_expires_30_days.png",
+                      uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/gs8FHbyPsH/mosq4e9l_expires_30_days.png',
                     }}
-                    resizeMode="stretch"
-                    style={{
-                      width: 20,
-                      height: 20,
-                      marginRight: 12,
-                    }}
+                    resizeMode={'stretch'}
+                    style={styles.image3}
                   />
                   <TextInput
-                    placeholder="••••••••"
+                    placeholder={'••••••••'}
                     value={password}
                     onChangeText={setPassword}
-                    placeholderTextColor="#CBD5E1"
+                    style={styles.input}
                     secureTextEntry={!showPassword}
-                    editable={!loading}
-                    style={{
-                      color: "#0A1332",
-                      fontSize: 16,
-                      flex: 1,
-                      paddingVertical: 17,
-                    }}
                   />
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                  <TouchableOpacity
+                    style={styles.box}
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
                     <Image
                       source={{
-                        uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/gs8FHbyPsH/qwjzjfcw_expires_30_days.png",
+                        uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/gs8FHbyPsH/qwjzjfcw_expires_30_days.png',
                       }}
-                      resizeMode="stretch"
-                      style={{
-                        width: 20,
-                        height: 20,
-                      }}
+                      resizeMode={'stretch'}
+                      style={styles.image4}
                     />
                   </TouchableOpacity>
                 </View>
               </View>
-
-              {/* Forgot Password */}
-              <View
-                style={{
-                  alignItems: "flex-end",
-                  marginBottom: 21,
-                }}
-              >
-                <TouchableOpacity>
-                  <Text
-                    style={{
-                      color: "#2F4FD8",
-                      fontSize: 14,
-                    }}
-                  >
-                    {"¿Olvidaste tu contraseña?"}
-                  </Text>
-                </TouchableOpacity>
+              <View style={styles.view5}>
+                <View style={styles.view6}>
+                  <Text style={styles.text7}>¿Olvidaste tu contraseña?</Text>
+                </View>
               </View>
-
-              {/* Login Button */}
-              <TouchableOpacity
-                style={{
-                  alignItems: "center",
-                  backgroundColor: "#1E3A8A",
-                  borderRadius: 16,
-                  paddingVertical: 16,
-                  opacity: loading ? 0.6 : 1,
-                }}
-                onPress={handleLogin}
-                disabled={loading}
-              >
-                {loading ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text
-                    style={{
-                      color: "#FFFFFF",
-                      fontSize: 16,
-                      fontWeight: "600",
-                    }}
-                  >
-                    {"Iniciar Sesión"}
-                  </Text>
-                )}
+              <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                <Text style={styles.text8}>Iniciar Sesión</Text>
               </TouchableOpacity>
             </View>
-
-            {/* Divider */}
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: 24,
-              }}
-            >
-              <View
-                style={{
-                  height: 1,
-                  flex: 1,
-                  backgroundColor: "#CBD5E1",
-                  marginRight: 16,
-                }}
-              />
-              <Text
-                style={{
-                  color: "#475569",
-                  fontSize: 14,
-                }}
-              >
-                {"o"}
-              </Text>
-              <View
-                style={{
-                  height: 1,
-                  flex: 1,
-                  backgroundColor: "#CBD5E1",
-                  marginLeft: 16,
-                }}
-              />
+            <View style={styles.row3}>
+              <View style={styles.box2}></View>
+              <View style={styles.view7}>
+                <Text style={styles.text9}>o</Text>
+              </View>
+              <View style={styles.box3}></View>
             </View>
-
-            {/* Sign Up Section */}
-            <View
-              style={{
-                marginBottom: 32,
-              }}
-            >
-              <View
-                style={{
-                  alignItems: "center",
-                  marginBottom: 12,
-                }}
-              >
-                <Text
-                  style={{
-                    color: "#475569",
-                    fontSize: 14,
-                  }}
-                >
-                  {"¿No tienes cuenta?"}
-                </Text>
+            <View style={styles.column7}>
+              <View style={styles.view8}>
+                <Text style={styles.text9}>¿No tienes cuenta?</Text>
               </View>
               <TouchableOpacity
-                style={{
-                  alignItems: "center",
-                  backgroundColor: "#FFFFFF",
-                  borderColor: "#1E3A8A",
-                  borderRadius: 16,
-                  borderWidth: 2,
-                  paddingVertical: 14,
-                  marginBottom: 12,
-                }}
-                onPress={handleSignUp}
-                disabled={loading}
+                style={styles.button2}
+                onPress={() => navigation.navigate('Register')}
               >
-                <Text
-                  style={{
-                    color: "#1E3A8A",
-                    fontSize: 16,
-                    fontWeight: "600",
-                  }}
-                >
-                  {"Crear Cuenta Nueva"}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={{
-                  alignItems: "center",
-                  backgroundColor: "#FFFFFF",
-                  borderColor: "#475569",
-                  borderRadius: 16,
-                  borderWidth: 2,
-                  paddingVertical: 14,
-                }}
-                onPress={() => navigation.navigate('Home')}
-                disabled={loading}
-              >
-                <Text
-                  style={{
-                    color: "#475569",
-                    fontSize: 16,
-                    fontWeight: "600",
-                  }}
-                >
-                  {"Volver a Atrás"}
-                </Text>
+                <Text style={styles.text10}>Crear Cuenta Nueva</Text>
               </TouchableOpacity>
             </View>
-
-            {/* Security Info */}
-            <View
-              style={{
-                flexDirection: "row",
-                backgroundColor: "#C7D2FE",
-                borderRadius: 16,
-                padding: 16,
-              }}
-            >
+            <View style={styles.row4}>
               <Image
                 source={{
-                  uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/gs8FHbyPsH/n3iry0bk_expires_30_days.png",
+                  uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/gs8FHbyPsH/n3iry0bk_expires_30_days.png',
                 }}
-                resizeMode="stretch"
-                style={{
-                  width: 20,
-                  height: 20,
-                  marginRight: 12,
-                  marginTop: 2,
-                }}
+                resizeMode={'stretch'}
+                style={styles.image3}
               />
-              <View
-                style={{
-                  flex: 1,
-                }}
-              >
-                <View
-                  style={{
-                    paddingBottom: 1,
-                    marginBottom: 4,
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: "#0A1433",
-                      fontSize: 14,
-                      fontWeight: "600",
-                    }}
-                  >
-                    {"100% Privado y Seguro"}
+              <View style={styles.column8}>
+                <View style={styles.view9}>
+                  <Text style={styles.text11}>100% Privado y Seguro</Text>
+                </View>
+                <View style={styles.view10}>
+                  <Text style={styles.text12}>
+                    Tus credenciales están cifradas. Tus denuncias son completamente anónimas.
                   </Text>
                 </View>
-                <Text
-                  style={{
-                    color: "#475569",
-                    fontSize: 12,
-                    lineHeight: 18,
-                  }}
-                >
-                  {
-                    "Tus credenciales están cifradas. Tus denuncias son completamente anónimas."
-                  }
-                </Text>
               </View>
             </View>
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  column: {
+    backgroundColor: '#E8EDFF',
+    paddingBottom: 32,
+  },
+  column2: {
+    alignItems: 'center',
+    backgroundColor: '#1E3A8A',
+    paddingTop: 64,
+  },
+  image: {
+    width: 48,
+    height: 48,
+    marginBottom: 12,
+  },
+  view: {
+    marginBottom: 8,
+  },
+  text: {
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  view2: {
+    marginBottom: 32,
+  },
+  text2: {
+    color: '#FFFFFF',
+    fontSize: 14,
+  },
+  column3: {
+    marginBottom: 32,
+    marginHorizontal: 24,
+  },
+  view3: {
+    marginBottom: 8,
+  },
+  text3: {
+    color: '#0F172A',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  view4: {
+    marginBottom: 24,
+  },
+  text4: {
+    color: '#64748B',
+    fontSize: 16,
+  },
+  column4: {
+    marginBottom: 24,
+  },
+  column5: {
+    marginBottom: 20,
+  },
+  text5: {
+    color: '#374151',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  image2: {
+    width: 20,
+    height: 20,
+    marginRight: 12,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+  },
+  column6: {
+    marginBottom: 23,
+  },
+  row2: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  image3: {
+    width: 20,
+    height: 20,
+    marginRight: 12,
+  },
+  box: {
+    marginLeft: 12,
+  },
+  image4: {
+    width: 20,
+    height: 20,
+  },
+  view5: {
+    alignItems: 'flex-end',
+    marginBottom: 24,
+  },
+  view6: {},
+  text7: {
+    color: '#1E3A8A',
+    fontSize: 14,
+  },
+  button: {
+    alignItems: 'center',
+    backgroundColor: '#1E3A8A',
+    borderRadius: 16,
+    paddingVertical: 16,
+  },
+  text8: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  row3: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginBottom: 24,
+  },
+  box2: {
+    height: 1,
+    flex: 1,
+    backgroundColor: '#CBD5E1',
+    marginRight: 16,
+  },
+  view7: {
+    marginHorizontal: 16,
+  },
+  text9: {
+    color: '#64748B',
+    fontSize: 14,
+  },
+  box3: {
+    height: 1,
+    flex: 1,
+    backgroundColor: '#CBD5E1',
+  },
+  column7: {
+    marginBottom: 32,
+  },
+  view8: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  button2: {
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#1E3A8A',
+    borderRadius: 16,
+    borderWidth: 2,
+    paddingVertical: 14,
+  },
+  text10: {
+    color: '#1E3A8A',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  row4: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  column8: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  view9: {
+    marginBottom: 4,
+  },
+  text11: {
+    color: '#0F172A',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  view10: {},
+  text12: {
+    color: '#64748B',
+    fontSize: 14,
+  },
+});

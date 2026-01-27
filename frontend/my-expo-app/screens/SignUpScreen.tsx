@@ -18,7 +18,7 @@ import type { RootStackParamList } from "navigation/RootNavigator";
 
 type SignUpScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "SignUp">;
 
-const BASE_URL = "http://192.168.100.6:5000";
+const BASE_URL = "http://192.168.100.6:8000";
 
 export default () => {
   const { width } = useWindowDimensions();
