@@ -72,7 +72,7 @@ export default () => {
           <View style={styles.column2}>
             <Image
               source={{
-                uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/gs8FHbyPsH/mrcwonl9_expires_30_days.png',
+                uri: 'https://drive.google.com/uc?export=view&id=1dIfjR1WmpF-d6Mm66angVz0NCCxVn_7Y',
               }}
               resizeMode={'stretch'}
               style={styles.image}
@@ -90,7 +90,7 @@ export default () => {
             </View>
             <View style={styles.view4}>
               <Text style={styles.text4}>
-                Accede de forma segura para realizar tus denuncias
+                Accede de forma segura para adminsitrar las denuncias de tus usuarios según tu rol
               </Text>
             </View>
             <View style={styles.column4}>
@@ -190,7 +190,7 @@ export default () => {
                 </View>
                 <View style={styles.view10}>
                   <Text style={styles.text12}>
-                    Tus credenciales están cifradas. Tus denuncias son completamente anónimas.
+                    Las denuncias son completamente anónimas pero tu pones las manos al fuego.
                   </Text>
                 </View>
               </View>
@@ -217,12 +217,12 @@ const styles = StyleSheet.create({
   column2: {
     alignItems: 'center',
     backgroundColor: '#1E3A8A',
-    paddingTop: 64,
+    paddingTop: 2,
   },
   image: {
-    width: 48,
-    height: 48,
-    marginBottom: 12,
+    width: 250,
+    height: 250,
+    marginBottom: -120,
   },
   view: {
     marginBottom: 8,
@@ -233,14 +233,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   view2: {
-    marginBottom: 32,
+    marginBottom: 22,
   },
   text2: {
     color: '#FFFFFF',
     fontSize: 14,
   },
   column3: {
-    marginBottom: 32,
+    marginBottom: 22,
     marginHorizontal: 24,
   },
   view3: {
