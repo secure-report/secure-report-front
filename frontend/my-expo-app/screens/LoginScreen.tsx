@@ -90,7 +90,7 @@ export default () => {
             </View>
             <View style={styles.view4}>
               <Text style={styles.text4}>
-                Accede de forma segura para adminsitrar las denuncias de tus usuarios según tu rol
+                Accede de forma segura para administrar las denuncias de tus usuarios según tu rol
               </Text>
             </View>
             <View style={styles.column4}>
