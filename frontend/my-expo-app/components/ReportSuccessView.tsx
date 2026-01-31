@@ -128,6 +128,7 @@ export default function ReportSuccessView({ route, navigation }: Props) {
 </TouchableOpacity>
 
 
+
           <TouchableOpacity
             style={secondaryBtn}
             onPress={() => navigation.navigate({

@@ -22,7 +22,7 @@ import { Report } from 'components/reportModel'; // ✅ AUMENTADO
    STACK PARAMS
    ======================= */
 export type RootStackParamList = {
-   Home: {
+  Home: {
     screen?: keyof AppTabParamList;
   };
   Login: undefined;
@@ -147,6 +147,7 @@ export function RootNavigator({ bottomInset = 0 }: { bottomInset?: number }) {
     >
       {!isLoggedIn ? (
         <>
+          {/* ✅ CAMBIO: ahora WelcomeScreen es realmente la pantalla de bienvenida */}
           <Stack.Screen name="Welcome" component={HomeScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
@@ -169,4 +170,3 @@ export function RootNavigator({ bottomInset = 0 }: { bottomInset?: number }) {
     </Stack.Navigator>
   );
 }
-
