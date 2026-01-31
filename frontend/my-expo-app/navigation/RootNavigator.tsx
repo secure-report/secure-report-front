@@ -14,12 +14,24 @@ import ReportsPanel from 'components/ReportsPanel';
 import ChatScreen from 'components/ChatScreen';
 import ProfileScreen from 'components/ProfileScreen';
 
+/* ✅ AUMENTADO */
+import ReportSuccessView from 'components/ReportSuccessView';
+import { Report } from 'components/reportModel'; // ✅ AUMENTADO
+
+/* =======================
+   STACK PARAMS
+   ======================= */
 export type RootStackParamList = {
   Home: undefined;
   Login: undefined;
   Register: undefined;
   Welcome: undefined;
-  Report: undefined;
+  NuevaDenuncia: undefined;
+
+  /* ✅ AQUÍ ESTABA EL ERROR */
+  ReportSuccessView: {
+    report: Report;
+  };
 };
 
 export type AppTabParamList = {
@@ -32,8 +44,10 @@ export type AppTabParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<AppTabParamList>();
+
 function AppTabs({ bottomInset = 0 }: { bottomInset?: number }) {
   const tabBarHeight = 65 + Math.max(bottomInset, 0);
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -140,9 +154,17 @@ export function RootNavigator({ bottomInset = 0 }: { bottomInset?: number }) {
           <Stack.Screen name="Home">
             {() => <AppTabs bottomInset={bottomInset} />}
           </Stack.Screen>
-          <Stack.Screen name="Report" component={ReportView} />
+
+          <Stack.Screen name="NuevaDenuncia" component={ReportView} />
+
+          {/* ✅ YA FUNCIONA PERFECTO */}
+          <Stack.Screen
+            name="ReportSuccessView"
+            component={ReportSuccessView}
+          />
         </>
       )}
     </Stack.Navigator>
   );
 }
+
