@@ -9,7 +9,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/RootNavigator";
-import { Report } from "./reportModel";
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+
+const navigation =
+  useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+navigation.getParent()?.navigate('Reportes');
 
 type Props = NativeStackScreenProps<
   RootStackParamList,
@@ -108,15 +115,19 @@ export default function ReportSuccessView({ route, navigation }: Props) {
 
           {/* BOTONES */}
           <TouchableOpacity
-            style={primaryBtn}
-            onPress={() => navigation.navigate("Home")}
-          >
-            <Text style={primaryText}>Ver Mis Reportes</Text>
-          </TouchableOpacity>
+                style={primaryBtn}
+                onPress={() => navigation.getParent()?.navigate('Reportes')}
+              >
+                <Text style={primaryText}>Ver mis reportes</Text>
+              </TouchableOpacity>
+
 
           <TouchableOpacity
             style={secondaryBtn}
-            onPress={() => navigation.navigate("Home")}
+            onPress={() => navigation.navigate({
+              name: "Home",
+              params: {},
+            })}
           >
             <Text style={secondaryText}>Volver al Inicio</Text>
           </TouchableOpacity>

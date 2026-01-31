@@ -22,7 +22,9 @@ import { Report } from 'components/reportModel'; // ✅ AUMENTADO
    STACK PARAMS
    ======================= */
 export type RootStackParamList = {
-  Home: undefined;
+   Home: {
+    screen?: keyof AppTabParamList;
+  };
   Login: undefined;
   Register: undefined;
   Welcome: undefined;
