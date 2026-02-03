@@ -53,9 +53,9 @@ export default () => {
             style={{
               width: "100%",
               backgroundColor: "#1E3A8A",
-              paddingHorizontal: 24,
+              paddingHorizontal: 30,
               paddingTop: 16 + 10, // 👈 extra para separarlo de la barra de estado
-              paddingBottom: 16,
+              paddingBottom: 26,
               flexDirection: "row",
               alignItems: "center",
             }}
@@ -76,16 +76,16 @@ export default () => {
           </View>
 
           {/* CUERPO */}
-          <View style={{ flex: 1, alignItems: "center", paddingTop: 28 * scale }}>
+          <View style={{ flex: 1, alignItems: "center", paddingTop: 8 * scale }}>
             <Image
               source={{
-                uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/gs8FHbyPsH/ydwjp9w6_expires_30_days.png",
+                uri: 'https://drive.google.com/uc?export=view&id=1ElI8uA7lokOuXW5X6cNhCLz8kV1aHP3i',
               }}
               resizeMode="contain"
               style={{
-                width: 133 * scale,
-                height: 102 * scale,
-                marginBottom: 22 * scale,
+                width: 350 * scale,
+                height: 350 * scale,
+                marginBottom: -90 * scale,
               }}
             />
 
