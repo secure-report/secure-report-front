@@ -14,10 +14,12 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 import * as DocumentPicker from 'expo-document-picker';
+import { useNavigation } from '@react-navigation/native';
 import { API_REPORTS_URL } from '../config/api';
 
 const ReportView = () => {
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<any>();
   const [activeTab, setActiveTab] = useState('reportar');
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
@@ -160,45 +162,58 @@ const handleUploadFile = async () => {
   }
 };
 
-  // 🚀 ENVIAR REPORTE
+  // 🚀 ENVIAR REPORTE (AQUÍ ESTÁ EL CAMBIO)
   const handleSubmit = async () => {
-  try {
-    console.log('🚀 Enviando denuncia...');
+    try {
+      if (!category || description.length < 10 || !coordinates) {
+        Alert.alert('Error', 'Completa todos los campos obligatorios');
+        return;
+      }
 
-    if (!category || description.length < 10 || !coordinates) {
-      Alert.alert('Error', 'Completa todos los campos obligatorios');
-      return;
+      const payload = {
+        anonymousUserId: 'anon_' + Math.random().toString(36).substring(2, 10),
+        category: mapCategory(category),
+        description,
+        location: {
+          type: 'Point',
+          coordinates,
+        },
+        addressReference: locationText,
+        media,
+      };
+
+      const response = await fetch(`${API_REPORTS_URL}/api/reports`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al enviar la denuncia');
+      }
+
+      const responseData = await response.json();
+
+        const report = {
+        id: responseData.id || responseData._id || 'REP-' + Date.now(),
+        category,
+        description,
+        addressReference: locationText,
+        media,
+        status: 'PENDING',
+        createdAt: new Date().toISOString(),
+        };
+
+
+      navigation.navigate('ReportSuccessView', {
+        report, // 👈 SE ENVÍAN LOS DATOS
+      });
+
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'No se pudo enviar la denuncia');
     }
-
-    const payload = {
-      anonymousUserId: 'anon_' + Math.random().toString(36).substring(2, 10),
-      category: mapCategory(category),
-      description,
-      location: {
-        type: 'Point',
-        coordinates,
-      },
-      addressReference: locationText,
-      media,
-    };
-
-    const response = await fetch(`${API_REPORTS_URL}/api/reports`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error('Error al enviar la denuncia');
-    }
-
-    Alert.alert('Denuncia enviada', 'Gracias por reportar');
-
-  } catch (error) {
-    console.error(error);
-    Alert.alert('Error', 'No se pudo enviar la denuncia');
-  }
-};
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
