@@ -29,7 +29,7 @@ export type RootStackParamList = {
   Register: undefined;
   Welcome: undefined;
   NuevaDenuncia: undefined;
-
+  Report: undefined;
   /* ✅ AQUÍ ESTABA EL ERROR */
   ReportSuccessView: {
     report: Report;
