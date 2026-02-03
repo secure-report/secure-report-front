@@ -29,7 +29,7 @@ export default function ProfileScreen({ role }: { role?: string }){
       )}
       {role === 'Anonimo' && (
         <TouchableOpacity
-          onPress={() => navigation.navigate('Login')}
+          onPress={() => navigation.navigate('ReportsMap')}
           className="rounded-md bg-red-600 px-6 py-3">
           <Text className="font-semibold text-white">Iniciar como Protector</Text>
         </TouchableOpacity>

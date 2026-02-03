@@ -17,6 +17,7 @@ import ProfileScreen from 'components/ProfileScreen';
 /* ✅ AUMENTADO */
 import ReportSuccessView from 'components/ReportSuccessView';
 import { Report } from 'components/reportModel'; // ✅ AUMENTADO
+import ReportsMap from 'components/ReportsMap';
 
 /* =======================
    STACK PARAMS
@@ -30,6 +31,7 @@ export type RootStackParamList = {
   Welcome: undefined;
   NuevaDenuncia: undefined;
   Report: undefined;
+  ReportsMap: undefined;
   /* ✅ AQUÍ ESTABA EL ERROR */
   ReportSuccessView: {
     report: Report;
@@ -231,11 +233,13 @@ export function RootNavigator({ bottomInset = 0 }: { bottomInset?: number }) {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="Report">{() => <AnonimousTabs bottomInset={bottomInset} />}</Stack.Screen>
+          <Stack.Screen name="ReportsMap" component={ReportsMap} />
         </>
       ) : (
         <>
           <Stack.Screen name="Home">{() => <AppTabs bottomInset={bottomInset} />}</Stack.Screen>
           <Stack.Screen name="NuevaDenuncia" component={ReportView} />
+          
           <Stack.Screen
             name="ReportSuccessView"
             component={ReportSuccessView}
