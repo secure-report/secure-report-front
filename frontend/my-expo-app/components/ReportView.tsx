@@ -13,9 +13,17 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
+import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import { useNavigation } from '@react-navigation/native';
+import { Video, ResizeMode } from 'expo-av';
 import { API_REPORTS_URL } from '../config/api';
+
+type MediaItem = {
+  type: 'image' | 'video';
+  url: string;
+};
+
 
 const ReportView = () => {
   const insets = useSafeAreaInsets();
@@ -25,7 +33,8 @@ const ReportView = () => {
   const [description, setDescription] = useState('');
   const [locationText, setLocationText] = useState('');
   const [coordinates, setCoordinates] = useState<number[] | null>(null);
-  const [media, setMedia] = useState<any[]>([]);
+  const [media, setMedia] = useState<MediaItem[]>([]);
+  const [showMediaOptions, setShowMediaOptions] = useState(false);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
 
   const categories = [
@@ -51,7 +60,7 @@ const ReportView = () => {
     return map[cat] || 'otros';
   };
 
- // 📍 UBICACIÓN REAL (sector / barrio)
+ // UBICACIÓN REAL (sector / barrio)
 const handleDetectLocation = async () => {
   try {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -107,7 +116,7 @@ const handleDetectLocation = async () => {
   }
 };
 
-// 📁 SUBIR ARCHIVO REAL (SEGÚN CONTRATO BACKEND)
+//  SUBIR ARCHIVO REAL (SEGÚN CONTRATO BACKEND)
 const handleUploadFile = async () => {
   try {
     const result = await DocumentPicker.getDocumentAsync({
@@ -160,6 +169,57 @@ const handleUploadFile = async () => {
       error.message || 'No se pudo subir el archivo'
     );
   }
+};
+
+const handleOpenCamera = async (mode: 'photo' | 'video') => {
+  try {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert('Permiso requerido', 'Acceso a la cámara necesario');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes:
+        mode === 'video'
+          ? ImagePicker.MediaTypeOptions.Videos
+          : ImagePicker.MediaTypeOptions.Images,
+      quality: 0.8,
+      videoMaxDuration: 60,
+    });
+
+    if (result.canceled) return;
+
+    const file = result.assets[0];
+
+    const formData = new FormData();
+    formData.append('file', {
+      uri: file.uri,
+      name: `camera-${Date.now()}`,
+      type: file.type === 'video' ? 'video/mp4' : 'image/jpeg',
+    } as any);
+
+    const response = await fetch(`${API_REPORTS_URL}/api/media/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    setMedia((prev) => [
+      ...prev,
+      { type: data.type, url: data.url },
+    ]);
+  } catch (e) {
+    Alert.alert('Error', 'No se pudo usar la cámara');
+  }
+};
+
+
+
+
+const handleRemoveMedia = (index: number) => {
+  setMedia((prev) => prev.filter((_, i) => i !== index));
 };
 
   // 🚀 ENVIAR REPORTE (AQUÍ ESTÁ EL CAMBIO)
@@ -342,7 +402,7 @@ const handleUploadFile = async () => {
               Fotos/Videos (Opcional)
             </Text>
             <TouchableOpacity
-              onPress={handleUploadFile}
+              onPress={() => setShowMediaOptions(true)}
               className="bg-indigo-50 rounded-lg px-4 py-4 border border-indigo-200 flex-row items-center justify-center"
             >
               <Text className="text-indigo-900 mr-2">⬆️</Text>
@@ -350,6 +410,38 @@ const handleUploadFile = async () => {
                 Subir Archivo
               </Text>
             </TouchableOpacity>
+            {media.length > 0 && (
+                <View className="flex-row flex-wrap mt-4">
+                    {media.map((item, index) => (
+                        <View key={index} className="relative mr-3 mb-3">
+                            {item.type === 'image' ? (
+                                <Image
+                                    source={{ uri: item.url }}
+                                    className="w-24 h-24 rounded-lg"
+                                    resizeMode="cover"
+                                />
+                                ) : (
+                                <Video
+                                source={{ uri: item.url }}
+                                style={{ width: 96, height: 96, borderRadius: 8 }}
+                                resizeMode={ResizeMode.COVER}
+                                useNativeControls
+                                />
+
+                                )}
+
+                            {/* BOTÓN X */}
+                            <TouchableOpacity
+                            onPress={() => handleRemoveMedia(index)}
+                            className="absolute -top-2 -right-2 bg-red-600 w-6 h-6 rounded-full items-center justify-center"
+                            >
+                            <Text className="text-white text-xs font-bold">✕</Text>
+                            </TouchableOpacity>
+                        </View>
+                        
+                        ))}
+                </View>
+                    )}
           </View>
 
           {/* Privacy Notice */}
@@ -374,7 +466,60 @@ const handleUploadFile = async () => {
               Enviar Denuncia Anónima
             </Text>
           </TouchableOpacity>
-        </ScrollView>
+         </ScrollView>
+
+          
+
+    {/* 👇👇👇 AQUÍ VA EL MODAL 👇👇👇 */}
+    {showMediaOptions && (
+      <View className="absolute inset-0 bg-black/40 justify-end">
+        <View className="bg-white rounded-t-2xl px-6 py-4">
+          <Text className="text-base font-semibold text-slate-800 mb-4">
+            Agregar archivo
+          </Text>
+
+          <TouchableOpacity
+            onPress={() => {
+              setShowMediaOptions(false);
+              handleOpenCamera('photo');
+            }}
+            className="py-4 border-b border-slate-200"
+          >
+            <Text className="text-slate-700 text-sm">📷 Tomar foto</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => {
+              setShowMediaOptions(false);
+              handleOpenCamera('video');
+            }}
+            className="py-4 border-b border-slate-200"
+          >
+            <Text className="text-slate-700 text-sm">🎥 Grabar video</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => {
+              setShowMediaOptions(false);
+              handleUploadFile();
+            }}
+            className="py-4"
+          >
+            <Text className="text-slate-700 text-sm">⬆️ Subir archivo</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setShowMediaOptions(false)}
+            className="mt-4 py-3"
+          >
+            <Text className="text-center text-red-600 font-medium">
+              Cancelar
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    )}
+
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

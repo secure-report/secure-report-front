@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/RootNavigator";
+import { Video, ResizeMode } from "expo-av";
 
 
 
@@ -75,21 +76,60 @@ export default function ReportSuccessView({ route, navigation }: Props) {
 
           {/* IMÁGENES */}
           {report.media.length > 0 && (
-            <Card>
-              <Text style={title}>Evidencias</Text>
+  <Card>
+    <Text style={title}>Evidencias</Text>
 
-              <View style={mediaContainer}>
-              {report.media.map((m, index) => (
-              <Image
-                  key={index}
+    <View style={mediaContainer}>
+      {report.media.map((m, index) => {
+        const isVideo =
+          m.type === "video" ||
+          m.url.endsWith(".mp4") ||
+          m.url.endsWith(".mov") ||
+          m.url.endsWith(".webm");
+
+        return (
+          <View key={index} style={{ position: "relative" }}>
+            {isVideo ? (
+              <>
+                <Video
                   source={{ uri: m.url }}
                   style={mediaImage}
-                   />
-              ))}
+                  resizeMode={ResizeMode.COVER}
+                  shouldPlay={false}
+                  isMuted
+                />
+                <View
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 28,
+                      color: "rgba(255, 255, 255, 0.8)", // plomo translúcido
+                    }}
+                  >
+                    ▶
+                  </Text>
 
-              </View>
-            </Card>
-          )}
+                </View>
+              </>
+            ) : (
+              <Image source={{ uri: m.url }} style={mediaImage} />
+            )}
+          </View>
+        );
+      })}
+    </View>
+  </Card>
+)}
+
 
           {/* ESTADO */}
           <Card horizontal>
