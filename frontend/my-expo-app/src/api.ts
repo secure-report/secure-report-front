@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
+
 // Resolve API base URL in this order:
 // 1. Expo Constants manifest extra (`app.json` extra) -> Constants.manifest.extra.API_BASE_URL
 // 2. process.env.API_BASE_URL (if you use a babel env plugin)
