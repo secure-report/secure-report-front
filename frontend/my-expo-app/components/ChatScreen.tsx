@@ -12,6 +12,7 @@ import {
   Keyboard,
   KeyboardEvent,
 } from 'react-native';
+import Header from './Header';
 import Markdown from 'react-native-markdown-display';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { chatQuery } from '../src/api';
@@ -286,12 +287,8 @@ Escribe sobre cualquiera de estos temas o pregunta algo específico.`;
   }, []);
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      {/* Top notch area with blue background */}
-      <View
-        className="bg-blue-900"
-        style={{ height: insets.top, position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 }}
-      />
+    <View className="flex-1 bg-white">
+      
       <StatusBar barStyle="light-content" backgroundColor="#1e3a8a" />
       <KeyboardAvoidingView
         // use padding behavior to shift content above the keyboard on all platforms
@@ -301,25 +298,17 @@ Escribe sobre cualquiera de estos temas o pregunta algo específico.`;
         keyboardVerticalOffset={0}>
         <View style={{ flex: 1 }}>
           {/* Header */}
-          <View className="flex-row items-center bg-blue-900 px-6 py-4 shadow-sm">
-            <Image
-              source={{
-                uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/6u90y110_expires_30_days.png',
-              }}
-              className="mr-3 h-12 w-12 rounded-full"
-              resizeMode="contain"
-            />
-            <View className="flex-1">
-              <Text className="text-xl font-semibold text-white">Asistente Virtual</Text>
-              <Text className="text-xs text-white/90">Siempre disponible para ayudarte</Text>
-            </View>
-            <View className="h-3 w-3 rounded-full bg-green-400" />
-          </View>
+          <Header
+            title="Asistente Virtual"
+            subtitle="Siempre disponible para ayudarte"
+            iconUri="https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/6u90y110_expires_30_days.png"
+          />
 
           {/* Messages */}
           <ScrollView
             ref={scrollViewRef}
-            className="flex-1 bg-slate-50 px-4"
+            className="flex-1 px-4" 
+             style={{ backgroundColor: '#E8EDFF'}}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="interactive"
             contentContainerStyle={{
@@ -419,7 +408,7 @@ Escribe sobre cualquiera de estos temas o pregunta algo específico.`;
 
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 

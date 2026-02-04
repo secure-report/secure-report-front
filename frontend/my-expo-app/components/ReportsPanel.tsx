@@ -15,6 +15,7 @@ import ReportDetail from './ReportDetail';
 import FiltersPanel from './FiltersPanel';
 import { Report } from './reportModel';
 import { API_REPORTS_URL } from '../config/api';
+import Header from './Header';
 
 /* API → UI */
 const mapStatusFromApi = (status: string) => {
@@ -121,10 +122,10 @@ const ReportsPanel = () => {
       </Modal>
 
       {/* HEADER */}
-      <View style={{ backgroundColor: '#1e40af', padding: 20 }}>
-        <Text className="text-2xl text-white font-bold">Panel de Reportes</Text>
-        <Text className="text-white">Gestión y supervisión de denuncias</Text>
-      </View>
+      <Header
+        title="Panel de Reportes"
+        subtitle="Gestión y supervisión de denuncias"
+      />
 
       <View className="px-4 py-4">
         {/* SEARCH + FILTER */}

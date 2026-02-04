@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Image } from 'react-native';
 import { useAuth } from '../context/AuthContext';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import HomeScreen from 'screens/HomeScreen';
 import LoginScreen from 'screens/LoginScreen';
@@ -17,6 +18,7 @@ import ProfileScreen from 'components/ProfileScreen';
 /* ✅ AUMENTADO */
 import ReportSuccessView from 'components/ReportSuccessView';
 import { Report } from 'components/reportModel'; // ✅ AUMENTADO
+import ReportsMap from 'components/ReportsMap';
 
 /* =======================
    STACK PARAMS
@@ -30,6 +32,7 @@ export type RootStackParamList = {
   Welcome: undefined;
   NuevaDenuncia: undefined;
   Report: undefined;
+  ReportsMap: undefined;
   /* ✅ AQUÍ ESTABA EL ERROR */
   ReportSuccessView: {
     report: Report;
@@ -39,6 +42,7 @@ export type RootStackParamList = {
 export type AppTabParamList = {
   Inicio: undefined;
   Reportes: undefined;
+  Mapa: undefined;
   Asistente: undefined;
   Perfil: undefined;
 };
@@ -85,9 +89,24 @@ function AppTabs({ bottomInset = 0 }: { bottomInset?: number }) {
         }}
       />
 
-       <Tab.Screen
+      <Tab.Screen
         name="Reportes"
         component={ReportsPanel}
+        options={{
+          tabBarIcon: () => (
+            <Image
+              source={{
+                uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/jvjhvsz2_expires_30_days.png',
+              }}
+              style={{ width: 22, height: 22 }}
+            />
+          ),
+        }}
+      />
+
+      <Tab.Screen
+        name="Mapa"
+        component={ReportsMap}
         options={{
           tabBarIcon: () => (
             <Image
@@ -208,8 +227,7 @@ function AnonimousTabs({ bottomInset = 0 }: { bottomInset?: number }) {
           ),
         }}
       />
-
-      </AnonimousTab.Navigator>
+    </AnonimousTab.Navigator>
   );
 }
 
