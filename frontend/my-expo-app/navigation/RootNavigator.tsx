@@ -14,6 +14,7 @@ import Inicio from 'components/Inicio';
 import ReportsPanel from 'components/ReportsPanel';
 import ChatScreen from 'components/ChatScreen';
 import ProfileScreen from 'components/ProfileScreen';
+import ConsultarDenuncia from 'components/ConsultarDenuncia';
 
 /* ✅ AUMENTADO */
 import ReportSuccessView from 'components/ReportSuccessView';
@@ -50,6 +51,7 @@ export type AppTabParamList = {
 export type AnonimousTabParamList = {
   Inicio: undefined;
   NuevaDenuncia: undefined;
+  Consultar: undefined
   Asistente: undefined;
   Perfil: undefined;
 };
@@ -187,6 +189,22 @@ function AnonimousTabs({ bottomInset = 0 }: { bottomInset?: number }) {
         component={ReportView}
         options={{
           title: 'Reportar',
+          tabBarIcon: () => (
+            <Image
+              source={{
+                uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/211j0lmf_expires_30_days.png',
+              }}
+              style={{ width: 22, height: 22 }}
+            />
+          ),
+        }}
+      />
+
+      <AnonimousTab.Screen
+        name="Consultar"
+        component={ConsultarDenuncia}
+        options={{
+          title: 'Consultar',
           tabBarIcon: () => (
             <Image
               source={{
