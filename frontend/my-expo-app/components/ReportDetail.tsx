@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator, Image, Linking } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Report } from './reportModel';
+import { Video, ResizeMode } from "expo-av";
+
 
 import { API_REPORTS_URL } from '../config/api';
 
@@ -131,27 +133,80 @@ const ReportDetail = ({
       </View>
 
       {/* Evidencia Fotográfica */}
-      <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 12, marginBottom: 12 }}>
-        <Text style={{ color: '#6B7280' }}>Evidencia Fotográfica ({report.media.length})</Text>
+          <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 12, marginBottom: 12 }}>
+            <Text style={{ color: '#6B7280' }}>
+              Evidencia Fotográfica ({report.media.length})
+            </Text>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8 }}>
-          {report.media.map((m, index) => (
-            <TouchableOpacity key={m.url ?? index} onPress={() => Linking.openURL(m.url)}>
-              <Image
-                source={{ uri: m.url }}
-                style={{
-                  width: 96,
-                  height: 96,
-                  borderRadius: 12,
-                  marginRight: 8,
-                  backgroundColor: '#E6EEF9',
-                }}
-                resizeMode="cover"
-              />
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8 }}>
+              {report.media.map((m, index) => {
+                const isVideo =
+                  m.type?.includes('video') ||
+                  m.url?.toLowerCase().endsWith('.mp4') ||
+                  m.url?.toLowerCase().endsWith('.mov') ||
+                  m.url?.toLowerCase().endsWith('.webm');
+
+                return (
+                  <TouchableOpacity
+                    key={m.url ?? index}
+                    onPress={() => Linking.openURL(m.url)}
+                    style={{ position: 'relative' }}
+                  >
+                    {isVideo ? (
+                      <>
+                        <Video
+                          source={{ uri: m.url }}
+                          style={{
+                            width: 96,
+                            height: 96,
+                            borderRadius: 12,
+                            marginRight: 8,
+                            backgroundColor: '#E6EEF9',
+                          }}
+                          resizeMode={ResizeMode.COVER}
+                          shouldPlay={false}
+                          isMuted
+                        />
+                        {/* ▶️ Ícono sobre el video */}
+                        <View
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 8,
+                            bottom: 0,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 28,
+                              color: 'rgba(219, 222, 228, 0.7)', // gris translúcido
+                            }}
+                          >
+                            ▶
+                          </Text>
+                        </View>
+                      </>
+                    ) : (
+                      <Image
+                        source={{ uri: m.url }}
+                        style={{
+                          width: 96,
+                          height: 96,
+                          borderRadius: 12,
+                          marginRight: 8,
+                          backgroundColor: '#ffffff',
+                        }}
+                        resizeMode="cover"
+                      />
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
 
       {/* Gestión de estado */}
       <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 12, marginBottom: 12 }}>

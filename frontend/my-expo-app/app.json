@@ -3,15 +3,12 @@
     "name": "my-expo-app",
     "slug": "my-expo-app",
     "version": "1.0.0",
-
     "web": {
       "favicon": "./assets/favicon.png"
     },
-
     "experiments": {
       "tsconfigPaths": true
     },
-
     "plugins": [
       [
         "expo-location",
@@ -19,22 +16,20 @@
           "locationWhenInUsePermission": "Permitir que la app acceda a tu ubicación para detectar el sector o barrio."
         }
       ],
-      "expo-document-picker"
+      "expo-document-picker",
+      "expo-video"
     ],
-
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-
     "userInterfaceStyle": "light",
-
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-
-    "assetBundlePatterns": ["**/*"],
-
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -43,7 +38,6 @@
         "NSCameraUsageDescription": "Se necesita acceso a la cámara para tomar evidencias."
       }
     },
-
     "android": {
       "permissions": [
         "ACCESS_FINE_LOCATION",
