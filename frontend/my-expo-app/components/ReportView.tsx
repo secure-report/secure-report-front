@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
+
   Platform,
   StatusBar,
   Alert,
@@ -18,6 +19,10 @@ import * as DocumentPicker from 'expo-document-picker';
 import { useNavigation } from '@react-navigation/native';
 import { Video, ResizeMode } from 'expo-av';
 import { API_REPORTS_URL } from '../config/api';
+import type { RootStackParamList } from 'navigation/RootNavigator';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
 type MediaItem = {
   type: 'image' | 'video';
@@ -399,7 +404,7 @@ const handleRemoveMedia = (index: number) => {
           {/* Fotos/Videos */}
           <View className="mb-6">
             <Text className="text-sm font-medium text-slate-700 mb-2">
-              Fotos/Videos (Opcional)
+              Foto/Video <Text className="text-red-500">*</Text>
             </Text>
             <TouchableOpacity
               onPress={() => setShowMediaOptions(true)}
@@ -520,6 +525,7 @@ const handleRemoveMedia = (index: number) => {
       </View>
     )}
 
+    
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

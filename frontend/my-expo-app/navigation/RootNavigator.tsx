@@ -231,15 +231,14 @@ export function RootNavigator({ bottomInset = 0 }: { bottomInset?: number }) {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="Report">{() => <AnonimousTabs bottomInset={bottomInset} />}</Stack.Screen>
+          <Stack.Screen name="NuevaDenuncia" component={ReportView} />
+          <Stack.Screen name="ReportSuccessView"component={ReportSuccessView}
+          />
         </>
       ) : (
         <>
           <Stack.Screen name="Home">{() => <AppTabs bottomInset={bottomInset} />}</Stack.Screen>
-          <Stack.Screen name="NuevaDenuncia" component={ReportView} />
-          <Stack.Screen
-            name="ReportSuccessView"
-            component={ReportSuccessView}
-          />
+
         </>
       )}
     </Stack.Navigator>

@@ -148,36 +148,26 @@ export default function ReportSuccessView({ route, navigation }: Props) {
           </Card>
 
           {/* BOTONES */}
-<TouchableOpacity
-  style={primaryBtn}
-  onPress={() =>
-    navigation.reset({
-      index: 0,
-      routes: [
-        {
-          name: 'Home',
-          params: {
-            screen: 'Reportes',
-          },
-        },
-      ],
-    })
-  }
->
-  <Text style={primaryText}>Ver mis reportes</Text>
-</TouchableOpacity>
 
+              <TouchableOpacity
+              style={primaryBtn}
+              onPress={() =>
 
+                navigation.reset({
+                        index: 0,
+                        routes: [
+                          {
+                            name: "Report",
+                            params: { screen: "Inicio" },
+                          },
+                        ],
+                      })
+                      }
 
-          <TouchableOpacity
-            style={secondaryBtn}
-            onPress={() => navigation.navigate({
-              name: "Home",
-              params: {},
-            })}
-          >
-            <Text style={secondaryText}>Volver al Inicio</Text>
-          </TouchableOpacity>
+            >
+              <Text style={primaryText}>Volver al Inicio</Text>
+            </TouchableOpacity>
+
 
           {/* FOOTER */}
           <View style={secureBox}>
