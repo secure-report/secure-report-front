@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Image } from 'react-native';
 import { useAuth } from '../context/AuthContext';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import HomeScreen from 'screens/HomeScreen';
 import LoginScreen from 'screens/LoginScreen';
@@ -41,6 +42,7 @@ export type RootStackParamList = {
 export type AppTabParamList = {
   Inicio: undefined;
   Reportes: undefined;
+  Mapa: undefined;
   Asistente: undefined;
   Perfil: undefined;
 };
@@ -87,9 +89,24 @@ function AppTabs({ bottomInset = 0 }: { bottomInset?: number }) {
         }}
       />
 
-       <Tab.Screen
+      <Tab.Screen
         name="Reportes"
         component={ReportsPanel}
+        options={{
+          tabBarIcon: () => (
+            <Image
+              source={{
+                uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/jvjhvsz2_expires_30_days.png',
+              }}
+              style={{ width: 22, height: 22 }}
+            />
+          ),
+        }}
+      />
+
+      <Tab.Screen
+        name="Mapa"
+        component={ReportsMap}
         options={{
           tabBarIcon: () => (
             <Image
@@ -210,8 +227,7 @@ function AnonimousTabs({ bottomInset = 0 }: { bottomInset?: number }) {
           ),
         }}
       />
-
-      </AnonimousTab.Navigator>
+    </AnonimousTab.Navigator>
   );
 }
 
@@ -232,18 +248,17 @@ export function RootNavigator({ bottomInset = 0 }: { bottomInset?: number }) {
           <Stack.Screen name="Welcome" component={HomeScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
-          <Stack.Screen name="Report">{() => <AnonimousTabs bottomInset={bottomInset} />}</Stack.Screen>
+          <Stack.Screen name="Report">
+            {() => <AnonimousTabs bottomInset={bottomInset} />}
+          </Stack.Screen>
           <Stack.Screen name="ReportsMap" component={ReportsMap} />
+          <Stack.Screen name="NuevaDenuncia" component={ReportView} />
+
+          <Stack.Screen name="ReportSuccessView" component={ReportSuccessView} />
         </>
       ) : (
         <>
           <Stack.Screen name="Home">{() => <AppTabs bottomInset={bottomInset} />}</Stack.Screen>
-          <Stack.Screen name="NuevaDenuncia" component={ReportView} />
-          
-          <Stack.Screen
-            name="ReportSuccessView"
-            component={ReportSuccessView}
-          />
         </>
       )}
     </Stack.Navigator>

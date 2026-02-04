@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, Modal, StyleSheet } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import ReportDetail from './ReportDetail';
 import { Report } from './reportModel';
 import { API_REPORTS_URL } from '../config/api';
 import { WebView } from 'react-native-webview';
+import Header from './Header';
 
 const ReportsMap = () => {
+  const insets = useSafeAreaInsets();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
@@ -37,42 +40,45 @@ const ReportsMap = () => {
   if (loading) return <ActivityIndicator style={{ marginTop: 40 }} size="large" />;
 
   // Show a WebView with Leaflet (works on Expo Go)
-    let markers = reports
-      .map((r) => {
-        // support multiple location shapes: { lat, lng } or GeoJSON { type: 'Point', coordinates: [lng, lat] }
-        let lat: number | null = null;
-        let lng: number | null = null;
-        if (r.location) {
-          if (Array.isArray(r.location.coordinates) && r.location.coordinates.length >= 2) {
-            lng = Number(r.location.coordinates[0]);
-            lat = Number(r.location.coordinates[1]);
-          } else if (r.location.lat != null && r.location.lng != null) {
-            lat = Number(r.location.lat);
-            lng = Number(r.location.lng);
-          }
+  let markers = reports
+    .map((r) => {
+      // support multiple location shapes: { lat, lng } or GeoJSON { type: 'Point', coordinates: [lng, lat] }
+      let lat: number | null = null;
+      let lng: number | null = null;
+      if (r.location) {
+        if (r.location.lat != null && r.location.lng != null) {
+          lat = Number(r.location.lat);
+          lng = Number(r.location.lng);
         }
+      }
 
-        return {
-          id: r.id,
-          lat,
-          lng,
-          title: r.description?.split('\n')[0] ?? 'Reporte',
-          address: r.addressReference ?? '',
-        };
-      })
-      .filter((m) => m.lat != null && m.lng != null) as { id: string; lat: number; lng: number; title: string; address: string }[];
+      return {
+        id: r.id,
+        lat,
+        lng,
+        title: r.description?.split('\n')[0] ?? 'Reporte',
+        address: r.addressReference ?? '',
+      };
+    })
+    .filter((m) => m.lat != null && m.lng != null) as {
+    id: string;
+    lat: number;
+    lng: number;
+    title: string;
+    address: string;
+  }[];
 
-    // Add an example marker for demonstration (near first marker or a default location)
-    const exampleMarker = {
-      id: 'example-marker',
-      lat: markers.length ? markers[0].lat + 0.001 : -0.180653,
-      lng: markers.length ? markers[0].lng + 0.001 : -78.467834,
-      title: 'Marcador de ejemplo',
-      address: 'Ejemplo',
-    };
-    markers.push(exampleMarker);
+  // Add an example marker for demonstration (near first marker or a default location)
+  const exampleMarker = {
+    id: 'example-marker',
+    lat: markers.length ? markers[0].lat + 0.001 : -0.180653,
+    lng: markers.length ? markers[0].lng + 0.001 : -78.467834,
+    title: 'Marcador de ejemplo',
+    address: 'Ejemplo',
+  };
+  markers.push(exampleMarker);
 
-    const html = `
+  const html = `
       <!doctype html>
       <html>
       <head>
@@ -130,15 +136,20 @@ const ReportsMap = () => {
       </html>
     `;
 
-    return (
+  return (
+    <View className="flex-1 bg-white">
+      
+      <Header
+        title="Mapa de Reportes"
+        subtitle="Gestión y supervisión de denuncias"
+      />
       <View style={{ flex: 1 }}>
-        <Text style={styles.header}>Mapa de Reportes</Text>
         {webViewError && (
           <Text style={{ color: 'red', paddingHorizontal: 16 }}>{webViewError}</Text>
         )}
         <View style={{ flex: 1 }}>
           <WebView
-            originWhitelist={["*"]}
+            originWhitelist={['*']}
             source={{ html }}
             style={{ flex: 1 }}
             javaScriptEnabled={true}
@@ -181,18 +192,29 @@ const ReportsMap = () => {
 
         <Modal visible={!!selectedReport} animationType="slide">
           {selectedReport && (
-            <ReportDetail report={selectedReport} onClose={() => setSelectedReport(null)} onUpdated={loadReports} />
+            <ReportDetail
+              report={selectedReport}
+              onClose={() => setSelectedReport(null)}
+              onUpdated={loadReports}
+            />
           )}
         </Modal>
       </View>
-    );
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#E8EDFF' },
   header: { fontSize: 18, fontWeight: '700', marginBottom: 8 },
   card: { backgroundColor: 'white', padding: 12, borderRadius: 10, marginBottom: 10 },
-  openBtn: { marginTop: 8, backgroundColor: '#2563EB', padding: 8, borderRadius: 8, alignItems: 'center' },
+  openBtn: {
+    marginTop: 8,
+    backgroundColor: '#2563EB',
+    padding: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
 });
 
 export default ReportsMap;
