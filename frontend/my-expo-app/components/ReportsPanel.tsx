@@ -17,17 +17,6 @@ import { Report } from './reportModel';
 import { API_REPORTS_URL } from '../config/api';
 import Header from './Header';
 
-/* API → UI */
-const mapStatusFromApi = (status: string) => {
-  switch (status) {
-    case 'pending': return 'PENDING';
-    case 'in_review': return 'IN_REVIEW';
-    case 'resolved': return 'RESOLVED';
-    case 'rejected': return 'REJECTED';
-    default: return 'PENDING';
-  }
-};
-
 const ReportsPanel = () => {
   const [query, setQuery] = useState('');
   const [reports, setReports] = useState<Report[]>([]);
@@ -35,9 +24,8 @@ const ReportsPanel = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
-  /* =========================
-     LOAD REPORTS (API REAL)
-     ========================= */
+  const [filters, setFilters] = useState<any>(null);
+
   const loadReports = async () => {
     try {
       const res = await fetch(`${API_REPORTS_URL}/api/reports`);
@@ -47,7 +35,7 @@ const ReportsPanel = () => {
         data.map((r: any) => ({
           ...r,
           id: r._id ?? r.id,
-          status: mapStatusFromApi(r.status),
+          status: r.status,
           media: r.media ?? [],
         }))
       );
@@ -58,41 +46,76 @@ const ReportsPanel = () => {
     }
   };
 
-  /* =========================
-     AUTO REFRESH cada 5 segundos
-     ========================= */
   useEffect(() => {
-    loadReports(); // carga inicial
-    const interval = setInterval(() => {
-      loadReports();
-    }, 5000); // cada 5 segundos
-
-    return () => clearInterval(interval); // limpiar al desmontar
+    loadReports();
+    const interval = setInterval(loadReports, 5000);
+    return () => clearInterval(interval);
   }, []);
 
-  /* =========================
-     FILTERS & STATS
-     ========================= */
   const filtered = useMemo(() => {
-    if (!query) return reports;
-    return reports.filter(
-      (r) =>
-        r.id.toLowerCase().includes(query.toLowerCase()) ||
-        r.description.toLowerCase().includes(query.toLowerCase())
-    );
-  }, [query, reports]);
+    let result = [...reports];
 
-  const counts = useMemo(() => {
-    const out = { PENDING: 0, IN_REVIEW: 0, RESOLVED: 0, REJECTED: 0 };
-    reports.forEach((r) => {
-      out[r.status] = (out[r.status] || 0) + 1;
-    });
-    return out;
-  }, [reports]);
+    if (query) {
+      result = result.filter(
+        r =>
+          r.id.toLowerCase().includes(query.toLowerCase()) ||
+          r.description.toLowerCase().includes(query.toLowerCase())
+      );
+    }
 
-  /* =========================
-     LOADING
-     ========================= */
+    if (!filters) return result;
+
+    if (filters.statuses?.length) {
+  result = result.filter(r =>
+    filters.statuses.includes(r.status.toLowerCase())
+  );
+}
+
+ if (filters.category) {
+  result = result.filter(r =>
+    r.category &&
+    r.category.toLowerCase().includes(filters.category.toLowerCase())
+  );
+}
+
+
+    if (filters.fromDate) {
+      const from = new Date(filters.fromDate);
+
+      result = result.filter(r =>
+        new Date(r.createdAt) >= from
+      );
+    }
+
+    if (filters.toDate) {
+      const to = new Date(filters.toDate);
+
+      result = result.filter(r =>
+        new Date(r.createdAt) <= to
+      );
+    }
+
+    return result;
+  }, [reports, query, filters]);
+
+ const counts = useMemo(() => {
+  const out: Record<string, number> = {
+    pending: 0,
+    in_review: 0,
+    resolved: 0,
+    rejected: 0,
+  };
+
+  reports.forEach((r) => {
+    if (out[r.status] !== undefined) {
+      out[r.status] += 1;
+    }
+  });
+
+  return out;
+}, [reports]);
+
+
   if (loading) {
     return <ActivityIndicator style={{ marginTop: 60 }} size="large" />;
   }
@@ -102,33 +125,32 @@ const ReportsPanel = () => {
       style={{ flex: 1, backgroundColor: '#E8EDFF' }}
       contentContainerStyle={{ paddingBottom: 32 }}
     >
-      {/* FILTERS MODAL */}
       <Modal visible={showFilters} animationType="slide">
         <FiltersPanel
           onClose={() => setShowFilters(false)}
-          onApply={() => setShowFilters(false)}
+          onApply={(f) => {
+            setFilters(f);
+            setShowFilters(false);
+          }}
         />
       </Modal>
 
-      {/* DETAIL MODAL */}
       <Modal visible={!!selectedReport} animationType="slide">
         {selectedReport && (
           <ReportDetail
             report={selectedReport}
             onClose={() => setSelectedReport(null)}
-            onUpdated={loadReports} // actualiza al cerrar detalle
+            onUpdated={loadReports}
           />
         )}
       </Modal>
 
-      {/* HEADER */}
       <Header
         title="Panel de Reportes"
         subtitle="Gestión y supervisión de denuncias"
       />
 
       <View className="px-4 py-4">
-        {/* SEARCH + FILTER */}
         <View className="flex-row items-center gap-3">
           <View className="flex-row items-center bg-white rounded-full px-4 py-3 flex-1">
             <MaterialCommunityIcons name="magnify" size={20} color="#6b7280" />
@@ -151,7 +173,6 @@ const ReportsPanel = () => {
           </TouchableOpacity>
         </View>
 
-        {/* STATS */}
         <View
           style={{
             flexDirection: 'row',
@@ -161,10 +182,10 @@ const ReportsPanel = () => {
           }}
         >
           {[
-            { label: 'Pendiente', value: counts.PENDING, color: 'text-yellow-600' },
-            { label: 'En Revisión', value: counts.IN_REVIEW, color: 'text-blue-600' },
-            { label: 'Resuelto', value: counts.RESOLVED, color: 'text-green-600' },
-            { label: 'Rechazado', value: counts.REJECTED, color: 'text-red-600' },
+            { label: 'Pendiente', value: counts.pending, color: 'text-yellow-600' },
+            { label: 'En Revisión', value: counts.in_review, color: 'text-blue-600' },
+            { label: 'Resuelto', value: counts.resolved, color: 'text-green-600' },
+            { label: 'Rechazado', value: counts.rejected, color: 'text-red-600' },
           ].map((c) => (
             <View key={c.label} style={{ width: '48%', marginBottom: 12 }}>
               <View className="bg-white rounded-xl p-4">
@@ -175,11 +196,20 @@ const ReportsPanel = () => {
           ))}
         </View>
 
-        {/* REPORTS LIST */}
         <View className="mt-6">
           {filtered.map((r) => (
-            <ReportItem key={r.id} report={r} onPress={() => setSelectedReport(r)} />
+            <ReportItem
+              key={r.id}
+              report={r}
+              onPress={() => setSelectedReport(r)}
+            />
           ))}
+
+          {filtered.length === 0 && (
+            <Text style={{ textAlign: 'center', marginTop: 20 }}>
+              No se encontraron reportes con esos filtros
+            </Text>
+          )}
         </View>
       </View>
     </ScrollView>

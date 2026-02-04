@@ -17,7 +17,8 @@
         }
       ],
       "expo-document-picker",
-      "expo-video"
+      "expo-video",
+      "@react-native-community/datetimepicker"
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",

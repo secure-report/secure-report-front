@@ -5,13 +5,13 @@ import { Report } from './reportModel';
 
 const statusLabel = (s: string) => {
   switch (s) {
-    case 'PENDING':
+    case 'pending':
       return { text: 'Pendiente', color: '#f59e0b' };
-    case 'IN_REVIEW':
+    case 'in_review':
       return { text: 'En Revisión', color: '#3b82f6' };
-    case 'RESOLVED':
+    case 'resolved':
       return { text: 'Resuelto', color: '#10b981' };
-    case 'REJECTED':
+    case 'rejected':
       return { text: 'Rechazado', color: '#ef4444' };
     default:
       return { text: s, color: '#6b7280' };
@@ -20,6 +20,7 @@ const statusLabel = (s: string) => {
 
 const ReportItem = ({ report, onPress }: { report: Report; onPress?: (r: Report) => void }) => {
   const status = statusLabel(report.status);
+
   const created = new Date(report.createdAt).toLocaleDateString('es-ES', {
     day: '2-digit',
     month: 'long',
@@ -29,28 +30,31 @@ const ReportItem = ({ report, onPress }: { report: Report; onPress?: (r: Report)
   return (
     <TouchableOpacity onPress={() => onPress && onPress(report)} activeOpacity={0.9}>
       <View className="bg-white rounded-lg p-4 shadow-sm mb-4">
-      <View className="flex-row justify-between items-start">
-        <View>
-          <Text className="text-sm text-gray-500">{report.id}</Text>
-          <Text className="text-gray-700 font-semibold mt-2">{report.category}</Text>
-        </View>
-        <View style={{ alignItems: 'flex-end' }}>
-          <View className="px-2 py-1 rounded-full" style={{ backgroundColor: '#eef2ff' }}>
-            <Text className="text-xs text-blue-800">{status.text}</Text>
+        <View className="flex-row justify-between items-start">
+          <View>
+            <Text className="text-sm text-gray-500">{report.id}</Text>
+            <Text className="text-gray-700 font-semibold mt-2">{report.category}</Text>
           </View>
-          <Text className="text-xs text-gray-500 mt-2">{created}</Text>
+
+          <View style={{ alignItems: 'flex-end' }}>
+            <View className="px-2 py-1 rounded-full" style={{ backgroundColor: '#eef2ff' }}>
+              <Text className="text-xs text-blue-800">{status.text}</Text>
+            </View>
+            <Text className="text-xs text-gray-500 mt-2">{created}</Text>
+          </View>
         </View>
-      </View>
 
-      <Text className="mt-3 text-gray-800">{report.description}</Text>
+        <Text className="mt-3 text-gray-800">{report.description}</Text>
 
-      <View className="flex-row items-center mt-3">
-        <MaterialCommunityIcons name="map-marker" size={16} color="#ef4444" />
-        <Text className="text-sm text-gray-600 ml-2">{report.addressReference}</Text>
-        <View style={{ flex: 1 }} />
-        <MaterialCommunityIcons name="camera" size={16} color="#6b7280" />
-        <Text className="text-sm text-gray-600 ml-2">{report.media.length}</Text>
-      </View>
+        <View className="flex-row items-center mt-3">
+          <MaterialCommunityIcons name="map-marker" size={16} color="#ef4444" />
+          <Text className="text-sm text-gray-600 ml-2">{report.addressReference}</Text>
+
+          <View style={{ flex: 1 }} />
+
+          <MaterialCommunityIcons name="camera" size={16} color="#6b7280" />
+          <Text className="text-sm text-gray-600 ml-2">{report.media.length}</Text>
+        </View>
       </View>
     </TouchableOpacity>
   );

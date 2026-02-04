@@ -4,11 +4,12 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  TextInput,
+  Platform,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-/* ---------- StatusOption ---------- */
+/* ---------- StatusOption (DISEÑO ORIGINAL) ---------- */
 const StatusOption = ({ label, color, icon, selected, onPress }: any) => (
   <TouchableOpacity
     onPress={onPress}
@@ -80,10 +81,19 @@ const FiltersPanel = ({
   onClose: () => void;
   onApply: (filters: any) => void;
 }) => {
-  const [statuses, setStatuses] = useState<string[]>(['IN_REVIEW']);
-  const [category, setCategory] = useState<string | null>('Precios Abusivos');
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+
+  // ESTADOS alineados con el modelo
+  const [statuses, setStatuses] = useState<string[]>(['in_review']);
+
+
+  // CATEGORÍAS alineadas con el modelo
+  const [category, setCategory] = useState<string | null>(null);
+
+  const [fromDate, setFromDate] = useState<Date | null>(null);
+  const [toDate, setToDate] = useState<Date | null>(null);
+
+  const [showFromPicker, setShowFromPicker] = useState(false);
+  const [showToPicker, setShowToPicker] = useState(false);
 
   const toggleStatus = (s: string) => {
     setStatuses(prev =>
@@ -91,18 +101,43 @@ const FiltersPanel = ({
     );
   };
 
+  const formatDate = (date: Date | null) => {
+    if (!date) return '';
+    return date.toISOString().split('T')[0];
+  };
+
+  const applyQuickRange = (days: number) => {
+    const now = new Date();
+    const past = new Date();
+    past.setDate(now.getDate() - days);
+
+    setFromDate(past);
+    setToDate(now);
+  };
+
   const applyFilters = () => {
     onApply({
       statuses,
       category,
-      fromDate,
-      toDate,
+      fromDate: fromDate ? fromDate.toISOString() : null,
+      toDate: toDate ? toDate.toISOString() : null,
     });
+    onClose();
+  };
+
+  const clearFilters = () => {
+    setStatuses([]);
+    setCategory(null);
+    setFromDate(null);
+    setToDate(null);
+
+    onApply(null);
     onClose();
   };
 
   return (
     <ScrollView style={{ padding: 16, backgroundColor: '#EEF2FF' }}>
+
       {/* ---------- ESTADOS ---------- */}
       <Text style={{ fontWeight: '700', fontSize: 16, marginBottom: 8 }}>
         Estado del Reporte
@@ -110,33 +145,36 @@ const FiltersPanel = ({
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
         <StatusOption
-          label="Pendiente"
-          color="#F59E0B"
-          icon="clock-outline"
-          selected={statuses.includes('PENDING')}
-          onPress={() => toggleStatus('PENDING')}
-        />
-        <StatusOption
-          label="En Revisión"
-          color="#2563EB"
-          icon="eye-outline"
-          selected={statuses.includes('IN_REVIEW')}
-          onPress={() => toggleStatus('IN_REVIEW')}
-        />
-        <StatusOption
-          label="Resuelto"
-          color="#10B981"
-          icon="check"
-          selected={statuses.includes('RESOLVED')}
-          onPress={() => toggleStatus('RESOLVED')}
-        />
-        <StatusOption
-          label="Rechazado"
-          color="#EF4444"
-          icon="close-circle-outline"
-          selected={statuses.includes('REJECTED')}
-          onPress={() => toggleStatus('REJECTED')}
-        />
+  label="Pendiente"
+  color="#F59E0B"
+  icon="clock-outline"
+  selected={statuses.includes('pending')}
+  onPress={() => toggleStatus('pending')}
+/>
+
+       <StatusOption
+  label="En Revisión"
+  color="#2563EB"
+  icon="eye-outline"
+  selected={statuses.includes('in_review')}
+  onPress={() => toggleStatus('in_review')}
+/>
+
+<StatusOption
+  label="Resuelto"
+  color="#10B981"
+  icon="check"
+  selected={statuses.includes('resolved')}
+  onPress={() => toggleStatus('resolved')}
+/>
+
+<StatusOption
+  label="Rechazado"
+  color="#EF4444"
+  icon="close-circle-outline"
+  selected={statuses.includes('rejected')}
+  onPress={() => toggleStatus('rejected')}
+/>
       </View>
 
       {/* ---------- CATEGORÍA ---------- */}
@@ -144,7 +182,15 @@ const FiltersPanel = ({
         Categoría
       </Text>
 
-      {['Precios Abusivos', 'Mala Calidad', 'Mal Servicio', 'Otras Irregularidades'].map(c => (
+      {[
+        'Precios Abusivos',
+        'Mala calidad de productos',
+        'Mal servicio al cliente',
+        'Publicidad engañosa',
+        'Incumplimiento de garantías',
+        'Falta de información',
+        'Otras irregularidades',
+      ].map(c => (
         <TouchableOpacity
           key={c}
           onPress={() => setCategory(c)}
@@ -176,7 +222,10 @@ const FiltersPanel = ({
               color={category === c ? 'white' : '#6B7280'}
             />
           </View>
-          <Text style={{ fontWeight: '600' }}>{c}</Text>
+
+          <Text style={{ fontWeight: '600' }}>
+            {c}
+          </Text>
         </TouchableOpacity>
       ))}
 
@@ -186,10 +235,8 @@ const FiltersPanel = ({
       </Text>
 
       <Text style={{ marginBottom: 6 }}>Desde</Text>
-      <TextInput
-        value={fromDate}
-        onChangeText={setFromDate}
-        placeholder="YYYY-MM-DD"
+      <TouchableOpacity
+        onPress={() => setShowFromPicker(true)}
         style={{
           backgroundColor: 'white',
           borderRadius: 12,
@@ -198,13 +245,25 @@ const FiltersPanel = ({
           borderColor: '#CBD5E1',
           marginBottom: 12,
         }}
-      />
+      >
+        <Text>{fromDate ? formatDate(fromDate) : 'YYYY-MM-DD'}</Text>
+      </TouchableOpacity>
+
+      {showFromPicker && (
+        <DateTimePicker
+          value={fromDate || new Date()}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={(_, date) => {
+            setShowFromPicker(false);
+            if (date) setFromDate(date);
+          }}
+        />
+      )}
 
       <Text style={{ marginBottom: 6 }}>Hasta</Text>
-      <TextInput
-        value={toDate}
-        onChangeText={setToDate}
-        placeholder="YYYY-MM-DD"
+      <TouchableOpacity
+        onPress={() => setShowToPicker(true)}
         style={{
           backgroundColor: 'white',
           borderRadius: 12,
@@ -212,7 +271,21 @@ const FiltersPanel = ({
           borderWidth: 1,
           borderColor: '#CBD5E1',
         }}
-      />
+      >
+        <Text>{toDate ? formatDate(toDate) : 'YYYY-MM-DD'}</Text>
+      </TouchableOpacity>
+
+      {showToPicker && (
+        <DateTimePicker
+          value={toDate || new Date()}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={(_, date) => {
+            setShowToPicker(false);
+            if (date) setToDate(date);
+          }}
+        />
+      )}
 
       {/* ---------- ACCESOS RÁPIDOS ---------- */}
       <Text style={{ fontWeight: '700', fontSize: 16, marginVertical: 8 }}>
@@ -220,13 +293,13 @@ const FiltersPanel = ({
       </Text>
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-        <QuickButton label="Hoy" onPress={() => {}} />
-        <QuickButton label="Últimos 7 días" onPress={() => {}} />
-        <QuickButton label="Últimos 30 días" onPress={() => {}} />
-        <QuickButton label="Últimos 90 días" onPress={() => {}} />
+        <QuickButton label="Hoy" onPress={() => applyQuickRange(0)} />
+        <QuickButton label="Últimos 7 días" onPress={() => applyQuickRange(7)} />
+        <QuickButton label="Últimos 30 días" onPress={() => applyQuickRange(30)} />
+        <QuickButton label="Últimos 90 días" onPress={() => applyQuickRange(90)} />
       </View>
 
-      {/* ---------- BOTÓN ---------- */}
+      {/* ---------- BOTONES ---------- */}
       <TouchableOpacity
         onPress={applyFilters}
         style={{
@@ -238,6 +311,20 @@ const FiltersPanel = ({
       >
         <Text style={{ color: 'white', textAlign: 'center', fontWeight: '700' }}>
           Aplicar filtros
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={clearFilters}
+        style={{
+          marginTop: 10,
+          backgroundColor: '#EF4444',
+          padding: 14,
+          borderRadius: 12,
+        }}
+      >
+        <Text style={{ color: 'white', textAlign: 'center', fontWeight: '700' }}>
+          Limpiar filtros
         </Text>
       </TouchableOpacity>
 

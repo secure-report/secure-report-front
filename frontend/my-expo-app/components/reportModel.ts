@@ -7,7 +7,8 @@ export type ReportCategory =
   | 'Falta de información'
   | 'Otras irregularidades';
 
-export type ReportStatus = 'PENDING' | 'IN_REVIEW' | 'RESOLVED' | 'REJECTED';
+export type ReportStatus = 'pending' | 'in_review' | 'resolved' | 'rejected';
+
 
 export interface LocationPoint {
   lat: number;
