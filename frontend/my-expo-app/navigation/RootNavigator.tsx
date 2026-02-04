@@ -149,21 +149,6 @@ function AnonimousTabs({ bottomInset = 0 }: { bottomInset?: number }) {
         },
       }}>
       <AnonimousTab.Screen
-        name="Inicio"
-        component={Inicio}
-        options={{
-          tabBarIcon: () => (
-            <Image
-              source={{
-                uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/twxd10f7_expires_30_days.png',
-              }}
-              style={{ width: 22, height: 22 }}
-            />
-          ),
-        }}
-      />
-
-      <AnonimousTab.Screen
         name="NuevaDenuncia"
         component={ReportView}
         options={{
@@ -194,21 +179,6 @@ function AnonimousTabs({ bottomInset = 0 }: { bottomInset?: number }) {
         }}
       />
 
-      <AnonimousTab.Screen
-        name="Perfil"
-        component={() => <ProfileScreen role={'Anonimo'} />}
-        options={{
-          tabBarIcon: () => (
-            <Image
-              source={{
-                uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/7992ct08_expires_30_days.png',
-              }}
-              style={{ width: 22, height: 22 }}
-            />
-          ),
-        }}
-      />
-
       </AnonimousTab.Navigator>
   );
 }
@@ -231,15 +201,14 @@ export function RootNavigator({ bottomInset = 0 }: { bottomInset?: number }) {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="Report">{() => <AnonimousTabs bottomInset={bottomInset} />}</Stack.Screen>
+          <Stack.Screen name="NuevaDenuncia" component={ReportView} />
+          <Stack.Screen name="ReportSuccessView"component={ReportSuccessView}
+          />
         </>
       ) : (
         <>
           <Stack.Screen name="Home">{() => <AppTabs bottomInset={bottomInset} />}</Stack.Screen>
-          <Stack.Screen name="NuevaDenuncia" component={ReportView} />
-          <Stack.Screen
-            name="ReportSuccessView"
-            component={ReportSuccessView}
-          />
+
         </>
       )}
     </Stack.Navigator>
