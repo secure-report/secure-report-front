@@ -149,21 +149,6 @@ function AnonimousTabs({ bottomInset = 0 }: { bottomInset?: number }) {
         },
       }}>
       <AnonimousTab.Screen
-        name="Inicio"
-        component={Inicio}
-        options={{
-          tabBarIcon: () => (
-            <Image
-              source={{
-                uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/twxd10f7_expires_30_days.png',
-              }}
-              style={{ width: 22, height: 22 }}
-            />
-          ),
-        }}
-      />
-
-      <AnonimousTab.Screen
         name="NuevaDenuncia"
         component={ReportView}
         options={{
@@ -187,21 +172,6 @@ function AnonimousTabs({ bottomInset = 0 }: { bottomInset?: number }) {
             <Image
               source={{
                 uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/6vl3tqoi_expires_30_days.png',
-              }}
-              style={{ width: 22, height: 22 }}
-            />
-          ),
-        }}
-      />
-
-      <AnonimousTab.Screen
-        name="Perfil"
-        component={() => <ProfileScreen role={'Anonimo'} />}
-        options={{
-          tabBarIcon: () => (
-            <Image
-              source={{
-                uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/7992ct08_expires_30_days.png',
               }}
               style={{ width: 22, height: 22 }}
             />
