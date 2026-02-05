@@ -85,7 +85,8 @@ const ReportDetail = ({
 }: {
   report: Report;
   onClose: () => void;
-  onUpdated: () => void;
+  onUpdated: (newStatus: string) => void;
+
 }) => {
   const [status, setStatus] = useState(report.status);
   const [loading, setLoading] = useState(false);
@@ -93,21 +94,41 @@ const ReportDetail = ({
   const applyChanges = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_REPORTS_URL}/api/reports/${report.id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: mapStatusToApi(status) }),
-      });
-      if (!res.ok) throw new Error();
-      Alert.alert('Éxito', 'Estado actualizado');
-      onUpdated();
+
+      console.log("🔵 Enviando cambio de estado...");
+      console.log("Report ID:", report.id);
+      console.log("Nuevo estado:", status);
+
+      const response = await fetch(
+        `${API_REPORTS_URL}/api/reports/${report.id}/status`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        }
+      );
+
+      console.log("🟣 Response status:", response.status);
+
+      const data = await response.json();
+      console.log("🟢 Respuesta del backend:", data);
+
+      if (!response.ok) {
+        throw new Error("Error en backend");
+      }
+
+      Alert.alert("Éxito", "Estado actualizado");
+
+      onUpdated(status);
       onClose();
-    } catch {
-      Alert.alert('Error', 'No se pudo actualizar el estado');
+    } catch (error) {
+      console.log("🔴 ERROR al actualizar:", error);
+      Alert.alert("Error", "No se pudo actualizar el estado");
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#E8EDFF' }} contentContainerStyle={{ padding: 16 }}>

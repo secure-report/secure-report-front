@@ -4,14 +4,20 @@ import {
   ScrollView,
   Image,
   Text,
+  Alert,
   TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/RootNavigator";
 import { Video, ResizeMode } from "expo-av";
+import * as Clipboard from 'expo-clipboard';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-
+const copyToClipboard = async (id: string) => {
+  await Clipboard.setStringAsync(id);
+  Alert.alert("Copiado", "El ID se ha copiado al portapapeles");
+};
 
 type Props = NativeStackScreenProps<
   RootStackParamList,
@@ -48,14 +54,41 @@ export default function ReportSuccessView({ route, navigation }: Props) {
 
         <View style={content}>
 
-          {/* ID */}
-          <Card>
-            <Text style={label}>ID de Seguimiento</Text>
-            <Text style={value}>{report.id}</Text>
-            <Text style={hint}>
-              Guarda este ID para consultar el estado de tu denuncia
-            </Text>
-          </Card>
+          {/* ID con botón de copiar */}
+<Card>
+  <Text style={label}>ID de Seguimiento</Text>
+
+  <View
+    style={{
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: 6,
+    }}
+  >
+    <Text style={{ fontWeight: "700", flex: 1, fontSize: 18 }}>
+      {report.id}
+    </Text>
+
+    <TouchableOpacity
+      onPress={() => copyToClipboard(report.id)}
+      style={{
+        padding: 10,
+        backgroundColor: "#E5E7EB",
+        borderRadius: 10,
+      }}
+    >
+      <MaterialCommunityIcons
+        name="content-copy"
+        size={20}
+        color="#374151"
+      />
+    </TouchableOpacity>
+  </View>
+
+  <Text style={hint}>
+    Guarda este ID para consultar el estado de tu denuncia
+  </Text>
+</Card>
 
           {/* RESUMEN */}
           <Card>

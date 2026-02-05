@@ -3,8 +3,6 @@ export const CATEGORY_CONFIG = [
   { label: 'Mala calidad de productos', value: 'productos_defectuosos' },
   { label: 'Mal servicio al cliente', value: 'mala_atencion' },
   { label: 'Publicidad engañosa', value: 'publicidad_enganosa' },
-  { label: 'Incumplimiento de garantías', value: 'incumplimiento_garantias' },
-  { label: 'Falta de información', value: 'falta_informacion' },
   { label: 'Otras irregularidades', value: 'otros' },
 ];
 

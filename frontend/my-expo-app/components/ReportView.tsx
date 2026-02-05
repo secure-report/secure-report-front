@@ -65,7 +65,7 @@ const handleDetectLocation = async () => {
 
     const address = geo[0];
 
-    // 🏘️ Construcción de dirección real
+    // Construcción de dirección real
     const sector =
     address.district ||
     address.subregion ||

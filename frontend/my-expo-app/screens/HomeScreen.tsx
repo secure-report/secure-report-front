@@ -161,17 +161,7 @@ export default () => {
               </View>
             </View>
 
-            {/* Decoración inferior: FULL WIDTH (ya no es “cuadro”) */}
-            <ImageBackground
-              source={{
-                uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/gs8FHbyPsH/0t7q61k6_expires_30_days.png",
-              }}
-              resizeMode="stretch"
-              style={{
-                width: "100%", // 👈 a ambos lados
-                height: 80 * scale,
-              }}
-            />
+           
           </View>
         </ScrollView>
       </SafeAreaView>

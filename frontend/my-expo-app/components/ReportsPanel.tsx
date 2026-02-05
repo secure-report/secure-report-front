@@ -146,11 +146,19 @@ if (filters.category) {
 
       <Modal visible={!!selectedReport} animationType="slide">
         {selectedReport && (
-          <ReportDetail
-            report={selectedReport}
-            onClose={() => setSelectedReport(null)}
-            onUpdated={loadReports}
-          />
+        <ReportDetail
+  report={selectedReport}
+  onClose={() => setSelectedReport(null)}
+  onUpdated={() => {
+    setReports(prev =>
+      prev.map(r =>
+        r.id === selectedReport.id
+          ? { ...r, status: selectedReport.status }
+          : r
+      )
+    );
+  }}
+/>
         )}
       </Modal>
 

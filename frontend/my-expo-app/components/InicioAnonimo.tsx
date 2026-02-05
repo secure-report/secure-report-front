@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { View, ScrollView, Text, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
