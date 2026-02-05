@@ -5,7 +5,7 @@ import Constants from 'expo-constants';
 // 1. Expo Constants manifest extra (`app.json` extra) -> Constants.manifest.extra.API_BASE_URL
 // 2. process.env.API_BASE_URL (if you use a babel env plugin)
 // 3. Hardcoded fallback (local IP you provided)
-const FALLBACK = 'http://192.168.100.74:8000';
+const FALLBACK = 'http://192.168.18.18:8000';
 const getBaseUrl = () => {
   try {
     // Expo managed: use Constants.manifest.extra if available
