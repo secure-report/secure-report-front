@@ -7,7 +7,6 @@ import {
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
-
   Platform,
   StatusBar,
   Alert,
@@ -19,10 +18,8 @@ import * as DocumentPicker from 'expo-document-picker';
 import { useNavigation } from '@react-navigation/native';
 import { Video, ResizeMode } from 'expo-av';
 import { API_REPORTS_URL } from '../config/api';
-import type { RootStackParamList } from 'navigation/RootNavigator';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { CATEGORY_CONFIG, getCategoryValue } from '../components/categoryMaper';
 
-type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
 type MediaItem = {
   type: 'image' | 'video';
@@ -41,29 +38,7 @@ const ReportView = () => {
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [showMediaOptions, setShowMediaOptions] = useState(false);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
-
-  const categories = [
-    'Precios abusivos',
-    'Mala calidad de productos',
-    'Mal servicio al cliente',
-    'Publicidad engañosa',
-    'Incumplimiento de garantías',
-    'Falta de información',
-    'Otras irregularidades',
-  ];
-
-  const mapCategory = (cat: string) => {
-    const map: any = {
-      'Precios abusivos': 'precios_abusivos',
-      'Mal servicio al cliente': 'mala_atencion',
-      'Mala calidad de productos': 'productos_defectuosos',
-      'Publicidad engañosa': 'publicidad_enganosa',
-      'Falta de información': 'otros',
-      'Incumplimiento de garantías': 'otros',
-      'Otras irregularidades': 'otros',
-    };
-    return map[cat] || 'otros';
-  };
+  const categories = CATEGORY_CONFIG.map(c => c.label);
 
  // UBICACIÓN REAL (sector / barrio)
 const handleDetectLocation = async () => {
@@ -235,17 +210,22 @@ const handleRemoveMedia = (index: number) => {
         return;
       }
 
-      const payload = {
-        anonymousUserId: 'anon_' + Math.random().toString(36).substring(2, 10),
-        category: mapCategory(category),
-        description,
-        location: {
-          type: 'Point',
-          coordinates,
-        },
-        addressReference: locationText,
-        media,
-      };
+          const payload = {
+            anonymousUserId: 'anon_' + Math.random().toString(36).substring(2, 10),
+
+            // 👇 AQUÍ convertimos automáticamente
+            category: getCategoryValue(category),
+
+            description,
+            location: {
+              type: 'Point',
+              coordinates,
+            },
+            addressReference: locationText,
+            media,
+          };
+
+
 
       const response = await fetch(`${API_REPORTS_URL}/api/reports`, {
         method: 'POST',
@@ -329,18 +309,21 @@ const handleRemoveMedia = (index: number) => {
 
             {showCategoryPicker && (
               <View className="mt-2 bg-white rounded-lg border border-slate-300 overflow-hidden">
-                {categories.map((cat, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => {
-                      setCategory(cat);
-                      setShowCategoryPicker(false);
-                    }}
-                    className={`px-4 py-3 ${index !== categories.length - 1 ? 'border-b border-slate-200' : ''}`}
-                  >
-                    <Text className="text-sm text-slate-800">{cat}</Text>
-                  </TouchableOpacity>
-                ))}
+             {CATEGORY_CONFIG.map((cat, index) => (
+  <TouchableOpacity
+    key={index}
+    onPress={() => {
+      setCategory(cat.label);
+      setShowCategoryPicker(false);
+    }}
+    className={`px-4 py-3 ${
+      index !== CATEGORY_CONFIG.length - 1 ? 'border-b border-slate-200' : ''
+    }`}
+  >
+    <Text className="text-sm text-slate-800">{cat.label}</Text>
+  </TouchableOpacity>
+))}
+
               </View>
             )}
           </View>

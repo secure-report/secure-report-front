@@ -11,9 +11,12 @@ import RegisterScreen from 'screens/RegisterScreen';
 import WelcomeScreen from 'screens/WelcomeScreen';
 import ReportView from 'components/ReportView';
 import Inicio from 'components/Inicio';
+import InicioAnonimo from 'components/InicioAnonimo';
 import ReportsPanel from 'components/ReportsPanel';
 import ChatScreen from 'components/ChatScreen';
 import ProfileScreen from 'components/ProfileScreen';
+import ConsultarDenuncia from 'components/ConsultarDenuncia';
+import ReportDetailAnonymous from 'components/ReportDetailAnonymous';
 
 /* ✅ AUMENTADO */
 import ReportSuccessView from 'components/ReportSuccessView';
@@ -33,9 +36,11 @@ export type RootStackParamList = {
   NuevaDenuncia: undefined;
   Report: undefined;
   ReportsMap: undefined;
-  /* ✅ AQUÍ ESTABA EL ERROR */
   ReportSuccessView: {
     report: Report;
+  };
+  ReportDetailAnonymous: {
+    reportId: string;
   };
 };
 
@@ -50,6 +55,7 @@ export type AppTabParamList = {
 export type AnonimousTabParamList = {
   Inicio: undefined;
   NuevaDenuncia: undefined;
+  Consultar: undefined
   Asistente: undefined;
   Perfil: undefined;
 };
@@ -169,7 +175,7 @@ function AnonimousTabs({ bottomInset = 0 }: { bottomInset?: number }) {
       }}>
       <AnonimousTab.Screen
         name="Inicio"
-        component={Inicio}
+        component={InicioAnonimo}
         options={{
           tabBarIcon: () => (
             <Image
@@ -187,6 +193,22 @@ function AnonimousTabs({ bottomInset = 0 }: { bottomInset?: number }) {
         component={ReportView}
         options={{
           title: 'Reportar',
+          tabBarIcon: () => (
+            <Image
+              source={{
+                uri: 'https://storage.googleapis.com/tagjs-prod.appspot.com/v1/xOFdAXP108/211j0lmf_expires_30_days.png',
+              }}
+              style={{ width: 22, height: 22 }}
+            />
+          ),
+        }}
+      />
+
+      <AnonimousTab.Screen
+        name="Consultar"
+        component={ConsultarDenuncia}
+        options={{
+          title: 'Consultar',
           tabBarIcon: () => (
             <Image
               source={{
@@ -250,6 +272,7 @@ export function RootNavigator({ bottomInset = 0 }: { bottomInset?: number }) {
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="Report">{() => <AnonimousTabs bottomInset={bottomInset} />}</Stack.Screen>
           <Stack.Screen name="NuevaDenuncia" component={ReportView} />
+          <Stack.Screen name="ReportDetailAnonymous" component={ReportDetailAnonymous} />
           <Stack.Screen name="ReportSuccessView"component={ReportSuccessView}
           />
         </>
