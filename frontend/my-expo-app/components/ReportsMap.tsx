@@ -7,31 +7,65 @@ import { API_REPORTS_URL } from '../config/api';
 import { WebView } from 'react-native-webview';
 import Header from './Header';
 
+interface RawReport {
+  _id: string;
+  title?: string;
+  description?: string;
+  addressReference?: string;
+  location?: {
+    type: string;
+    coordinates?: [number, number];
+  };
+  status?: string;
+  media?: any[];
+  [key: string]: any;
+}
+
 const ReportsMap = () => {
   const insets = useSafeAreaInsets();
-  const [reports, setReports] = useState<Report[]>([]);
+  const [reports, setReports] = useState<RawReport[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [modalLoading, setModalLoading] = useState(false);
   const [webViewError, setWebViewError] = useState<string | null>(null);
 
   const loadReports = async () => {
     try {
       const res = await fetch(`${API_REPORTS_URL}/api/reports`);
       const data = await res.json();
-      setReports(
-        data.map((r: any) => ({
-          ...r,
-          id: r._id ?? r.id,
-          status: r.status ?? 'PENDING',
-          media: r.media ?? [],
-        }))
-      );
+      setReports(data);
     } catch (e) {
       console.error('Error loading reports for map', e);
     } finally {
       setLoading(false);
     }
   };
+
+  const fetchReportDetail = async (reportId: string) => {
+    try {
+      setModalLoading(true);
+      const res = await fetch(`${API_REPORTS_URL}/api/reports/${reportId}`);
+      const data = await res.json();
+      
+      // Transformar al formato del modelo Report
+      const report: Report = {
+        ...data,
+        id: data._id,
+      };
+      setSelectedReport(report);
+    } catch (e) {
+      console.error('Error loading report detail', e);
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedReportId) {
+      fetchReportDetail(selectedReportId);
+    }
+  }, [selectedReportId]);
 
   useEffect(() => {
     loadReports();
@@ -45,19 +79,18 @@ const ReportsMap = () => {
       // support multiple location shapes: { lat, lng } or GeoJSON { type: 'Point', coordinates: [lng, lat] }
       let lat: number | null = null;
       let lng: number | null = null;
-      if (r.location) {
-        if (r.location.lat != null && r.location.lng != null) {
-          lat = Number(r.location.lat);
-          lng = Number(r.location.lng);
-        }
+      if (r.location && r.location.coordinates) {
+          lng = Number(r.location.coordinates[0]);
+          lat = Number(r.location.coordinates[1]);
+        
       }
 
       return {
-        id: r.id,
+        id: r._id,
         lat,
         lng,
-        title: r.description?.split('\n')[0] ?? 'Reporte',
-        address: r.addressReference ?? '',
+        title: r.title || (r.description?.split('\n')[0] ?? 'Reporte'),
+        //address: r.addressReference ?? '',
       };
     })
     .filter((m) => m.lat != null && m.lng != null) as {
@@ -180,8 +213,7 @@ const ReportsMap = () => {
                   return;
                 }
                 if (data.type === 'marker') {
-                  const r = reports.find((rep) => rep.id === data.id);
-                  if (r) setSelectedReport(r);
+                  setSelectedReportId(data.id);
                 }
               } catch (err) {
                 // ignore
@@ -191,13 +223,20 @@ const ReportsMap = () => {
         </View>
 
         <Modal visible={!!selectedReport} animationType="slide">
-          {selectedReport && (
+          {modalLoading ? (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <ActivityIndicator size="large" color="#1E3A8A" />
+            </View>
+          ) : selectedReport ? (
             <ReportDetail
               report={selectedReport}
-              onClose={() => setSelectedReport(null)}
+              onClose={() => {
+                setSelectedReport(null);
+                setSelectedReportId(null);
+              }}
               onUpdated={loadReports}
             />
-          )}
+          ) : null}
         </Modal>
       </View>
     </View>
