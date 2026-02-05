@@ -11,6 +11,7 @@ import RegisterScreen from 'screens/RegisterScreen';
 import WelcomeScreen from 'screens/WelcomeScreen';
 import ReportView from 'components/ReportView';
 import Inicio from 'components/Inicio';
+import InicioAnonimo from 'components/InicioAnonimo';
 import ReportsPanel from 'components/ReportsPanel';
 import ChatScreen from 'components/ChatScreen';
 import ProfileScreen from 'components/ProfileScreen';
@@ -171,7 +172,7 @@ function AnonimousTabs({ bottomInset = 0 }: { bottomInset?: number }) {
       }}>
       <AnonimousTab.Screen
         name="Inicio"
-        component={Inicio}
+        component={InicioAnonimo}
         options={{
           tabBarIcon: () => (
             <Image
