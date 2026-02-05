@@ -228,7 +228,7 @@ const ReportDetail = ({
           </View>
 
       {/* Gestión de estado */}
-      <View
+   <View
   style={{
     backgroundColor: 'white',
     borderRadius: 16,
@@ -313,7 +313,7 @@ const ReportDetail = ({
       <Text style={{ fontWeight: '800' }}>
         {status === 'PENDING'
           ? 'Pendiente'
-          : status === 'in_review'
+          : status === 'IN_REVIEW'
           ? 'En Revisión'
           : status === 'RESOLVED'
           ? 'Resuelto'
