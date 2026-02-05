@@ -263,32 +263,32 @@ const ReportDetail = ({
       label="Pendiente"
       color="#F59E0B"
       icon="clock-outline"
-      selected={status === 'PENDING'}
-      onPress={() => setStatus('PENDING')}
+      selected={status === 'pending'}
+      onPress={() => setStatus('pending')}
     />
 
     <StatusOption
       label="En Revisión"
       color="#2563EB"
       icon="eye-outline"
-      selected={status === 'IN_REVIEW'}
-      onPress={() => setStatus('IN_REVIEW')}
+      selected={status === 'in_review'}
+      onPress={() => setStatus('in_review')}
     />
 
     <StatusOption
       label="Resuelto"
       color="#10B981"
       icon="check-circle-outline"
-      selected={status === 'RESOLVED'}
-      onPress={() => setStatus('RESOLVED')}
+      selected={status === 'resolved'}
+      onPress={() => setStatus('resolved')}
     />
 
     <StatusOption
       label="Rechazado"
       color="#EF4444"
       icon="close-circle-outline"
-      selected={status === 'REJECTED'}
-      onPress={() => setStatus('REJECTED')}
+      selected={status === 'rejected'}
+      onPress={() => setStatus('rejected')}
     />
   </View>
 
@@ -311,11 +311,11 @@ const ReportDetail = ({
     >
       Estado actual:{' '}
       <Text style={{ fontWeight: '800' }}>
-        {status === 'PENDING'
+        {status === 'pending'
           ? 'Pendiente'
-          : status === 'IN_REVIEW'
+          : status === 'in_review'
           ? 'En Revisión'
-          : status === 'RESOLVED'
+          : status === 'resolved'
           ? 'Resuelto'
           : 'Rechazado'}
       </Text>
