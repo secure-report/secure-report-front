@@ -7,9 +7,9 @@ import {
   Platform,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { CATEGORY_CONFIG, getCategoryValue } from '../components/categoryMaper';
 
-/* ---------- StatusOption (DISEÑO ORIGINAL) ---------- */
+
 const StatusOption = ({ label, color, icon, selected, onPress }: any) => (
   <TouchableOpacity
     onPress={onPress}
@@ -55,7 +55,6 @@ const StatusOption = ({ label, color, icon, selected, onPress }: any) => (
   </TouchableOpacity>
 );
 
-/* ---------- QuickButton ---------- */
 const QuickButton = ({ label, onPress }: any) => (
   <TouchableOpacity
     onPress={onPress}
@@ -73,7 +72,6 @@ const QuickButton = ({ label, onPress }: any) => (
   </TouchableOpacity>
 );
 
-/* ---------- FiltersPanel ---------- */
 const FiltersPanel = ({
   onClose,
   onApply,
@@ -82,11 +80,7 @@ const FiltersPanel = ({
   onApply: (filters: any) => void;
 }) => {
 
-  // ESTADOS alineados con el modelo
   const [statuses, setStatuses] = useState<string[]>(['in_review']);
-
-
-  // CATEGORÍAS alineadas con el modelo
   const [category, setCategory] = useState<string | null>(null);
 
   const [fromDate, setFromDate] = useState<Date | null>(null);
@@ -117,11 +111,12 @@ const FiltersPanel = ({
 
   const applyFilters = () => {
     onApply({
-      statuses,
-      category,
-      fromDate: fromDate ? fromDate.toISOString() : null,
-      toDate: toDate ? toDate.toISOString() : null,
-    });
+  statuses,
+  category,
+  fromDate: fromDate?.toISOString() ?? null,
+  toDate: toDate?.toISOString() ?? null,
+});
+
     onClose();
   };
 
@@ -138,168 +133,85 @@ const FiltersPanel = ({
   return (
     <ScrollView style={{ padding: 16, backgroundColor: '#EEF2FF' }}>
 
-      {/* ---------- ESTADOS ---------- */}
       <Text style={{ fontWeight: '700', fontSize: 16, marginBottom: 8 }}>
         Estado del Reporte
       </Text>
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
         <StatusOption
-  label="Pendiente"
-  color="#F59E0B"
-  icon="clock-outline"
-  selected={statuses.includes('pending')}
-  onPress={() => toggleStatus('pending')}
-/>
+          label="Pendiente"
+          color="#F59E0B"
+          icon="clock-outline"
+          selected={statuses.includes('pending')}
+          onPress={() => toggleStatus('pending')}
+        />
 
-       <StatusOption
-  label="En Revisión"
-  color="#2563EB"
-  icon="eye-outline"
-  selected={statuses.includes('in_review')}
-  onPress={() => toggleStatus('in_review')}
-/>
+        <StatusOption
+          label="En Revisión"
+          color="#2563EB"
+          icon="eye-outline"
+          selected={statuses.includes('in_review')}
+          onPress={() => toggleStatus('in_review')}
+        />
 
-<StatusOption
-  label="Resuelto"
-  color="#10B981"
-  icon="check"
-  selected={statuses.includes('resolved')}
-  onPress={() => toggleStatus('resolved')}
-/>
+        <StatusOption
+          label="Resuelto"
+          color="#10B981"
+          icon="check"
+          selected={statuses.includes('resolved')}
+          onPress={() => toggleStatus('resolved')}
+        />
 
-<StatusOption
-  label="Rechazado"
-  color="#EF4444"
-  icon="close-circle-outline"
-  selected={statuses.includes('rejected')}
-  onPress={() => toggleStatus('rejected')}
-/>
+        <StatusOption
+          label="Rechazado"
+          color="#EF4444"
+          icon="close-circle-outline"
+          selected={statuses.includes('rejected')}
+          onPress={() => toggleStatus('rejected')}
+        />
       </View>
 
-      {/* ---------- CATEGORÍA ---------- */}
       <Text style={{ fontWeight: '700', fontSize: 16, marginVertical: 8 }}>
         Categoría
       </Text>
 
-      {[
-        'Precios Abusivos',
-        'Mala calidad de productos',
-        'Mal servicio al cliente',
-        'Publicidad engañosa',
-        'Incumplimiento de garantías',
-        'Falta de información',
-        'Otras irregularidades',
-      ].map(c => (
-        <TouchableOpacity
-          key={c}
-          onPress={() => setCategory(c)}
-          style={{
-            backgroundColor: category === c ? '#FEE2E2' : 'white',
-            borderRadius: 12,
-            padding: 14,
-            marginBottom: 10,
-            borderWidth: 1,
-            borderColor: category === c ? '#FCA5A5' : '#E6E9F2',
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
-        >
-          <View
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 18,
-              backgroundColor: category === c ? '#FCA5A5' : '#F8FAFF',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginRight: 12,
-            }}
-          >
-            <MaterialCommunityIcons
-              name="tag"
-              size={18}
-              color={category === c ? 'white' : '#6B7280'}
-            />
-          </View>
+      {CATEGORY_CONFIG.map(cat => (
+  <TouchableOpacity
+    key={cat.value}
+    onPress={() => setCategory(cat.value)}
+    style={{
+      backgroundColor: category === cat.value ? '#FEE2E2' : 'white',
+      borderRadius: 12,
+      padding: 14,
+      marginBottom: 10,
+      borderWidth: 1,
+      borderColor: category === cat.value ? '#FCA5A5' : '#E6E9F2',
+      flexDirection: 'row',
+      alignItems: 'center',
+    }}
+  >
 
-          <Text style={{ fontWeight: '600' }}>
-            {c}
-          </Text>
-        </TouchableOpacity>
-      ))}
+    <View
+      style={{
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: category === cat.label ? '#FCA5A5' : '#F8FAFF',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 12,
+      }}
+    >
+      <MaterialCommunityIcons name="tag" size={18} color="#6B7280" />
+    </View>
 
-      {/* ---------- FECHAS ---------- */}
-      <Text style={{ fontWeight: '700', fontSize: 16, marginBottom: 8 }}>
-        Rango de Fechas
-      </Text>
+    <Text style={{ fontWeight: '600' }}>{cat.label}</Text>
+  </TouchableOpacity>
+))}
+         
 
-      <Text style={{ marginBottom: 6 }}>Desde</Text>
-      <TouchableOpacity
-        onPress={() => setShowFromPicker(true)}
-        style={{
-          backgroundColor: 'white',
-          borderRadius: 12,
-          padding: 12,
-          borderWidth: 1,
-          borderColor: '#CBD5E1',
-          marginBottom: 12,
-        }}
-      >
-        <Text>{fromDate ? formatDate(fromDate) : 'YYYY-MM-DD'}</Text>
-      </TouchableOpacity>
 
-      {showFromPicker && (
-        <DateTimePicker
-          value={fromDate || new Date()}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={(_, date) => {
-            setShowFromPicker(false);
-            if (date) setFromDate(date);
-          }}
-        />
-      )}
 
-      <Text style={{ marginBottom: 6 }}>Hasta</Text>
-      <TouchableOpacity
-        onPress={() => setShowToPicker(true)}
-        style={{
-          backgroundColor: 'white',
-          borderRadius: 12,
-          padding: 12,
-          borderWidth: 1,
-          borderColor: '#CBD5E1',
-        }}
-      >
-        <Text>{toDate ? formatDate(toDate) : 'YYYY-MM-DD'}</Text>
-      </TouchableOpacity>
-
-      {showToPicker && (
-        <DateTimePicker
-          value={toDate || new Date()}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={(_, date) => {
-            setShowToPicker(false);
-            if (date) setToDate(date);
-          }}
-        />
-      )}
-
-      {/* ---------- ACCESOS RÁPIDOS ---------- */}
-      <Text style={{ fontWeight: '700', fontSize: 16, marginVertical: 8 }}>
-        Accesos Rápidos
-      </Text>
-
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-        <QuickButton label="Hoy" onPress={() => applyQuickRange(0)} />
-        <QuickButton label="Últimos 7 días" onPress={() => applyQuickRange(7)} />
-        <QuickButton label="Últimos 30 días" onPress={() => applyQuickRange(30)} />
-        <QuickButton label="Últimos 90 días" onPress={() => applyQuickRange(90)} />
-      </View>
-
-      {/* ---------- BOTONES ---------- */}
       <TouchableOpacity
         onPress={applyFilters}
         style={{

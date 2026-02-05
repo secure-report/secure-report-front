@@ -9,11 +9,14 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-
 import ReportItem from './ReportItem';
 import ReportDetail from './ReportDetail';
 import FiltersPanel from './FiltersPanel';
 import { Report } from './reportModel';
+import { getCategoryLabel, CATEGORY_CONFIG } from '../components/categoryMaper';
+
+
+
 import { API_REPORTS_URL } from '../config/api';
 import Header from './Header';
 
@@ -31,14 +34,15 @@ const ReportsPanel = () => {
       const res = await fetch(`${API_REPORTS_URL}/api/reports`);
       const data = await res.json();
 
-      setReports(
-        data.map((r: any) => ({
-          ...r,
-          id: r._id ?? r.id,
-          status: r.status,
-          media: r.media ?? [],
-        }))
-      );
+          setReports(
+          data.map((r: any) => ({
+            ...r,
+            id: r._id ?? r.id,
+            status: r.status,
+            media: r.media ?? [],
+            category: getCategoryLabel(r.category),   // 👈 AQUÍ convertimos a bonito
+          }))
+        );
     } catch (e) {
       console.error('Error loading reports', e);
     } finally {
@@ -71,11 +75,16 @@ const ReportsPanel = () => {
   );
 }
 
- if (filters.category) {
-  result = result.filter(r =>
-    r.category &&
-    r.category.toLowerCase().includes(filters.category.toLowerCase())
-  );
+if (filters.category) {
+  result = result.filter(r => {
+    if (!r.category) return false;
+
+    const realValue = CATEGORY_CONFIG.find(
+      c => c.label.toLowerCase() === r.category.toLowerCase()
+    )?.value;
+
+    return realValue === filters.category;
+  });
 }
 
 
