@@ -22,35 +22,60 @@ const mapStatusToApi = (status: string) => {
 const StatusOption = ({ label, color, icon, selected, onPress }: any) => (
   <TouchableOpacity
     onPress={onPress}
+    activeOpacity={0.85}
     style={{
-      flex: 1,
-      minHeight: 88,
-      margin: 6,
-      borderRadius: 12,
+      width: '47%',
+      marginVertical: 6,
+      marginHorizontal: '1.5%',
+      borderRadius: 16,
       borderWidth: selected ? 2 : 1,
-      borderColor: selected ? color : '#CBD5E1',
-      backgroundColor: selected ? `${color}20` : '#F8FAFF',
+      borderColor: selected ? color : '#E2E8F0',
+      backgroundColor: selected ? `${color}15` : 'white',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: 12,
+      paddingVertical: 18,
+      paddingHorizontal: 12,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: selected ? 0.2 : 0.08,
+      shadowRadius: 6,
+      elevation: selected ? 3 : 1,
     }}
   >
     <View
       style={{
-        width: 48,
-        height: 48,
-        borderRadius: 24,
+        width: 50,
+        height: 50,
+        borderRadius: 25,
         backgroundColor: selected ? color : '#F1F5F9',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 8,
       }}
     >
-      <MaterialCommunityIcons name={icon} size={22} color={selected ? 'white' : color} />
+      <MaterialCommunityIcons
+        name={icon}
+        size={24}
+        color={selected ? 'white' : color}
+      />
     </View>
-    <Text style={{ color: selected ? color : '#0F172A', fontWeight: selected ? '700' : '600' }}>{label}</Text>
+
+    <Text
+      numberOfLines={1}
+      adjustsFontSizeToFit
+      style={{
+        color: selected ? color : '#0F172A',
+        fontWeight: selected ? '800' : '600',
+        fontSize: 14,
+        textAlign: 'center',
+      }}
+    >
+      {label}
+    </Text>
   </TouchableOpacity>
 );
+
+
 
 /* Componente principal del detalle del reporte */
 const ReportDetail = ({
@@ -115,12 +140,6 @@ const ReportDetail = ({
         <Text style={{ fontWeight: '700', marginTop: 6 }}>{report.category}</Text>
       </View>
 
-      <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 12, marginBottom: 12 }}>
-        <Text style={{ color: '#6B7280' }}>Título</Text>
-        <Text style={{ fontWeight: '700', marginTop: 6 }}>
-          {report.description.split('\n')[0] ?? report.description}
-        </Text>
-      </View>
 
       <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 12, marginBottom: 12 }}>
         <Text style={{ color: '#6B7280' }}>Descripción</Text>
@@ -209,52 +228,101 @@ const ReportDetail = ({
           </View>
 
       {/* Gestión de estado */}
-      <View style={{ backgroundColor: 'white', borderRadius: 12, padding: 12, marginBottom: 12 }}>
-        <Text style={{ color: '#6B7280', fontWeight: '700', marginBottom: 8 }}>Gestionar Estado del Reporte</Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-          <StatusOption
-            label="Pendiente"
-            color="#F59E0B"
-            icon="clock-outline"
-            selected={status === 'PENDING'}
-            onPress={() => setStatus('PENDING')}
-          />
-          <StatusOption
-            label="En Revisión"
-            color="#2563EB"
-            icon="eye-outline"
-            selected={status === 'IN_REVIEW'}
-            onPress={() => setStatus('IN_REVIEW')}
-          />
-          <StatusOption
-            label="Resuelto"
-            color="#10B981"
-            icon="check"
-            selected={status === 'RESOLVED'}
-            onPress={() => setStatus('RESOLVED')}
-          />
-          <StatusOption
-            label="Rechazado"
-            color="#EF4444"
-            icon="close-circle-outline"
-            selected={status === 'REJECTED'}
-            onPress={() => setStatus('REJECTED')}
-          />
-        </View>
+      <View
+  style={{
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 2,
+  }}
+>
+  <Text
+    style={{
+      color: '#1F2937',
+      fontWeight: '800',
+      fontSize: 16,
+      marginBottom: 12,
+    }}
+  >
+    Gestionar Estado del Reporte
+  </Text>
 
-        <View style={{ backgroundColor: '#FFFBEB', borderRadius: 8, padding: 12, marginTop: 12 }}>
-          <Text style={{ color: '#92400E' }}>
-            Estado actual:{' '}
-            {status === 'PENDING'
-              ? 'Pendiente'
-              : status === 'IN_REVIEW'
-              ? 'En Revisión'
-              : status === 'RESOLVED'
-              ? 'Resuelto'
-              : 'Rechazado'}
-          </Text>
-        </View>
-      </View>
+  <View
+    style={{
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+    }}
+  >
+    <StatusOption
+      label="Pendiente"
+      color="#F59E0B"
+      icon="clock-outline"
+      selected={status === 'PENDING'}
+      onPress={() => setStatus('PENDING')}
+    />
+
+    <StatusOption
+      label="En Revisión"
+      color="#2563EB"
+      icon="eye-outline"
+      selected={status === 'IN_REVIEW'}
+      onPress={() => setStatus('IN_REVIEW')}
+    />
+
+    <StatusOption
+      label="Resuelto"
+      color="#10B981"
+      icon="check-circle-outline"
+      selected={status === 'RESOLVED'}
+      onPress={() => setStatus('RESOLVED')}
+    />
+
+    <StatusOption
+      label="Rechazado"
+      color="#EF4444"
+      icon="close-circle-outline"
+      selected={status === 'REJECTED'}
+      onPress={() => setStatus('REJECTED')}
+    />
+  </View>
+
+  <View
+    style={{
+      backgroundColor: '#F8FAFC',
+      borderRadius: 12,
+      padding: 14,
+      marginTop: 14,
+      borderWidth: 1,
+      borderColor: '#E2E8F0',
+    }}
+  >
+    <Text
+      style={{
+        color: '#334155',
+        fontWeight: '600',
+        textAlign: 'center',
+      }}
+    >
+      Estado actual:{' '}
+      <Text style={{ fontWeight: '800' }}>
+        {status === 'PENDING'
+          ? 'Pendiente'
+          : status === 'in_review'
+          ? 'En Revisión'
+          : status === 'RESOLVED'
+          ? 'Resuelto'
+          : 'Rechazado'}
+      </Text>
+    </Text>
+  </View>
+</View>
+
 
       {/* Botones */}
       <View style={{ flexDirection: 'row', marginTop: 8, marginBottom: 32 }}>

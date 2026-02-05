@@ -9,51 +9,68 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { CATEGORY_CONFIG, getCategoryValue } from '../components/categoryMaper';
 
-
 const StatusOption = ({ label, color, icon, selected, onPress }: any) => (
   <TouchableOpacity
     onPress={onPress}
+    activeOpacity={0.9}
     style={{
-      flex: 1,
-      minHeight: 100,
-      margin: 6,
-      borderRadius: 12,
-      borderWidth: selected ? 2 : 1,
-      borderColor: selected ? color : '#CBD5E1',
-      backgroundColor: selected ? `${color}20` : '#F8FAFF',
+      width: '46%',
+      margin: '2%',
+
+      borderRadius: 16,
+
+      borderWidth: 1,
+      borderColor: selected ? color : '#E2E8F0',
+
+      backgroundColor: selected ? color : 'white',
+
       alignItems: 'center',
       justifyContent: 'center',
-      padding: 12,
+
+      paddingVertical: 22,
+      paddingHorizontal: 10,
+
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.1,
+      shadowRadius: 6,
+      elevation: 3,
     }}
   >
     <View
       style={{
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: selected ? color : '#F1F5F9',
+        width: 64,
+        height: 64,
+        borderRadius: 32,
+        backgroundColor: selected ? 'rgba(255,255,255,0.25)' : '#F1F5F9',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 8,
+        marginBottom: 12,
       }}
     >
       <MaterialCommunityIcons
         name={icon}
-        size={20}
+        size={28}
         color={selected ? 'white' : color}
       />
     </View>
 
     <Text
       style={{
-        color: selected ? color : '#0F172A',
-        fontWeight: selected ? '700' : '600',
+        color: selected ? 'white' : '#0F172A',
+        fontWeight: '700',
+        fontSize: 14,
+        textAlign: 'center',
+        lineHeight: 18,
       }}
     >
       {label}
     </Text>
   </TouchableOpacity>
 );
+
+
+
 
 const QuickButton = ({ label, onPress }: any) => (
   <TouchableOpacity
@@ -194,6 +211,7 @@ const FiltersPanel = ({
     <View
       style={{
         width: 36,
+        
         height: 36,
         borderRadius: 18,
         backgroundColor: category === cat.label ? '#FCA5A5' : '#F8FAFF',
