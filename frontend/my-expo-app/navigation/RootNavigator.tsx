@@ -16,6 +16,7 @@ import ReportsPanel from 'components/ReportsPanel';
 import ChatScreen from 'components/ChatScreen';
 import ProfileScreen from 'components/ProfileScreen';
 import ConsultarDenuncia from 'components/ConsultarDenuncia';
+import ReportDetailAnonymous from 'components/ReportDetailAnonymous';
 
 /* ✅ AUMENTADO */
 import ReportSuccessView from 'components/ReportSuccessView';
@@ -35,9 +36,11 @@ export type RootStackParamList = {
   NuevaDenuncia: undefined;
   Report: undefined;
   ReportsMap: undefined;
-  /* ✅ AQUÍ ESTABA EL ERROR */
   ReportSuccessView: {
     report: Report;
+  };
+  ReportDetailAnonymous: {
+    reportId: string;
   };
 };
 
@@ -269,6 +272,7 @@ export function RootNavigator({ bottomInset = 0 }: { bottomInset?: number }) {
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="Report">{() => <AnonimousTabs bottomInset={bottomInset} />}</Stack.Screen>
           <Stack.Screen name="NuevaDenuncia" component={ReportView} />
+          <Stack.Screen name="ReportDetailAnonymous" component={ReportDetailAnonymous} />
           <Stack.Screen name="ReportSuccessView"component={ReportSuccessView}
           />
         </>

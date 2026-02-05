@@ -1,16 +1,48 @@
 import React, { useState } from 'react';
-import { View, ScrollView, Text, Image, TextInput, TouchableOpacity } from 'react-native';
+import { View, ScrollView, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import Header from './Header';
+import { API_REPORTS_URL } from '../config/api';
 
 export default function ConsultarDenuncia() {
+  const navigation = useNavigation<any>();
   const [reportId, setReportId] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleConsultar = () => {
-    if (reportId.trim()) { 
-      // TODO: Implement report status check logic
-      alert(`Consultando reporte: ${reportId}`);
-    } else {
-      alert('Por favor ingresa un ID de reporte');
+  const handleConsultar = async () => {
+    if (!reportId.trim()) {
+      setError('Por favor ingresa un ID de reporte');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(`${API_REPORTS_URL}/api/reports/${reportId.trim()}`);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          setError('Reporte no encontrado. Verifica el ID e intenta de nuevo.');
+        } else {
+          setError('Error al buscar el reporte. Intenta de nuevo.');
+        }
+        return;
+      }
+
+      const reportData = await response.json();
+
+      // Navigate to report detail screen with the fetched report data
+      navigation.navigate('ReportDetailAnonymous', { 
+        reportId: reportId.trim(),
+        report: reportData 
+      });
+    } catch (err) {
+      setError('Error de conexión. Verifica tu conexión a internet.');
+      console.error('Error fetching report:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -62,11 +94,25 @@ export default function ConsultarDenuncia() {
 
           {/* Button */}
           <TouchableOpacity
-            className="mb-6 flex-row items-center justify-center rounded-2xl bg-slate-300 py-4"
-            onPress={handleConsultar}>
-            <Text className="mr-2 text-lg">🔍</Text>
-            <Text className="text-base font-medium text-slate-700">Consultar Estado</Text>
+            className="mb-6 flex-row items-center justify-center rounded-2xl bg-slate-300 py-4 disabled:opacity-50"
+            onPress={handleConsultar}
+            disabled={loading}>
+            {loading ? (
+              <ActivityIndicator size="small" color="#475569" />
+            ) : (
+              <>
+                <Text className="mr-2 text-lg">🔍</Text>
+                <Text className="text-base font-medium text-slate-700">Consultar Estado</Text>
+              </>
+            )}
           </TouchableOpacity>
+
+          {/* Error Message */}
+          {error && (
+            <View className="mb-6 rounded-2xl bg-red-100 px-4 py-3">
+              <Text className="text-center text-sm font-medium text-red-700">{error}</Text>
+            </View>
+          )}
 
           {/* Security Message */}
           <View className="rounded-2xl bg-[#FEF3C7] px-4 py-4">
